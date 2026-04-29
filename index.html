@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부품 재고 관리</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px}
+.app{max-width:900px;margin:0 auto;padding:24px 16px}
+h1{font-size:18px;font-weight:600;color:#111}
+.tabs{display:flex;border-bottom:1px solid #e0e0e0;margin-bottom:20px;background:#fff;border-radius:10px 10px 0 0;padding:0 8px}
+.tab{padding:12px 20px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.tab.on{color:#111;border-bottom:2px solid #111}
+.sec{display:none}.sec.on{display:block}
+.topbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+input[type=text],select{font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;outline:none}
+input[type=text]:focus,select:focus{border-color:#888}
+.btn{padding:7px 16px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#111;font-size:13px;cursor:pointer;font-weight:500}
+.btn:hover{background:#f0f0f0}
+.btn-p{background:#111;color:#fff;border-color:#111}
+.btn-p:hover{background:#333}
+.btn-d{color:#c0392b;border-color:#ddd}
+.btn-d:hover{background:#fff5f5}
+.plist{display:flex;flex-direction:column;gap:6px}
+.prow{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:12px;padding:11px 16px;background:#fff;border:1px solid #e8e8e8;border-radius:10px;transition:border-color .15s}
+.prow:hover{border-color:#bbb}
+.prow.low{border-left:3px solid #f39c12}
+.prow.out{border-left:3px solid #e74c3c}
+.pname{font-size:13px;font-weight:600;color:#111}
+.pmeta{font-size:11px;color:#888;margin-top:2px}
+.stock-ctrl{display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+.scbtn{width:32px;height:32px;border:none;background:#f5f5f3;color:#111;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.scbtn:hover{background:#e8e8e8}
+.scval{width:44px;text-align:center;font-size:14px;font-weight:600;padding:0 2px;border:none;outline:none;background:#fff;color:#111}
+.chk-wrap{display:flex;gap:5px}
+.chkbtn{width:36px;height:36px;border-radius:8px;border:1px solid #ddd;background:#f5f5f3;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;font-weight:700}
+.chkbtn.sell{background:#EBF5FF;border-color:#90CAF9;color:#1565C0}
+.chkbtn.sell:hover{background:#BBDEFB}
+.chkbtn.buy{background:#E8F5E9;border-color:#A5D6A7;color:#2E7D32}
+.chkbtn.buy:hover{background:#C8E6C9}
+.chkbtn:active{transform:scale(.88)}
+.edit-sm{font-size:11px;color:#aaa;cursor:pointer;padding:4px 8px;border:1px solid transparent;border-radius:6px;background:none}
+.edit-sm:hover{border-color:#ddd;color:#555}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.b-ok{background:#E8F5E9;color:#2E7D32}
+.b-low{background:#FFF8E1;color:#E65100}
+.b-out{background:#FFEBEE;color:#C62828}
+.b-gray{background:#f0f0f0;color:#666}
+.b-blue{background:#EBF5FF;color:#1565C0}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.mcard{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:14px 16px}
+.mcard-l{font-size:11px;color:#888;margin-bottom:4px}
+.mcard-v{font-size:22px;font-weight:700;color:#111}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:16px;margin-bottom:12px}
+.card-hd{font-size:11px;font-weight:600;color:#888;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px}
+.tbl-wrap{overflow-x:auto;background:#fff;border:1px solid #e8e8e8;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:#888;border-bottom:1px solid #eee;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #eee;color:#111}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eee;font-size:13px}
+.hist-row:last-child{border-bottom:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:420px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal-hd{font-size:15px;font-weight:700;margin-bottom:16px}
+.mform{display:flex;flex-direction:column;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:#888;font-weight:500}
+.fg input,.fg select{font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;width:100%;outline:none}
+.fg input:focus,.fg select:focus{border-color:#888}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-ft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.toast{position:fixed;bottom:24px;right:24px;background:#111;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+.guide{display:flex;gap:16px;align-items:center;padding:10px 16px;background:#f5f5f3;border-radius:8px;margin-bottom:12px;font-size:12px;color:#666;flex-wrap:wrap}
+.guide-item{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:2px}
+.bar-o{height:5px;background:#eee;border-radius:3px;margin-top:3px}
+.bar-i{height:5px;border-radius:3px}
+.rank-row{padding:6px 0;font-size:13px;border-bottom:1px solid #eee}
+.rank-row:last-child{border-bottom:none}
+.empty{color:#aaa;font-size:13px;padding:8px 0}
+.spinner{width:18px;height:18px;border:2px solid #eee;border-top-color:#111;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-badge{font-size:11px;display:flex;align-items:center;gap:5px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#2E7D32;display:inline-block}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr 1fr}
+  .prow{grid-template-columns:1fr auto auto}
+  .edit-sm{display:none}
+  h1{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+  <h1>부품 재고 관리</h1>
+  <div class="sync-badge" id="sync-status">
+    <div class="spinner" style="width:12px;height:12px;border-width:1.5px"></div> 연결 중...
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="goTab('quick',this)">빠른 재고</button>
+  <button class="tab" onclick="goTab('inv',this)">재고 현황</button>
+  <button class="tab" onclick="goTab('hist',this)">거래 내역</button>
+  <button class="tab" onclick="goTab('dash',this)">통계</button>
+</div>
+
+<!-- 빠른재고 -->
+<div id="s-quick" class="sec on">
+  <div class="topbar">
+    <input type="text" id="q-search" placeholder="부품명 검색..." style="width:180px" oninput="renderQuick()">
+    <select id="q-cat" onchange="renderQuick()"><option value="">전체 카테고리</option></select>
+    <select id="q-st" onchange="renderQuick()">
+      <option value="">전체 상태</option>
+      <option value="ok">정상</option><option value="low">부족</option><option value="out">재고없음</option>
+    </select>
+    <button class="btn btn-p" onclick="openAdd()" style="margin-left:auto">+ 부품 추가</button>
+  </div>
+  <div class="guide">
+    <div class="guide-item"><div class="dot" style="background:#90CAF9"></div><span>파란 버튼 = 판매 −1</span></div>
+    <div class="guide-item"><div class="dot" style="background:#A5D6A7"></div><span>초록 버튼 = 입고 +1</span></div>
+    <div class="guide-item"><span style="color:#aaa">│</span></div>
+    <div class="guide-item"><span>숫자 직접 클릭 → 수량 수정 후 Enter</span></div>
+  </div>
+  <div class="plist" id="quick-list">
+    <div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px">
+      <div class="spinner"></div> 데이터 불러오는 중...
+    </div>
+  </div>
+</div>
+
+<!-- 재고현황 -->
+<div id="s-inv" class="sec">
+  <div class="topbar">
+    <input type="text" id="i-search" placeholder="부품명 검색..." style="width:160px" oninput="renderInv()">
+    <select id="i-cat" onchange="renderInv()"><option value="">전체 카테고리</option></select>
+    <select id="i-st" onchange="renderInv()">
+      <option value="">전체 상태</option><option value="ok">정상</option><option value="low">부족</option><option value="out">재고없음</option>
+    </select>
+    <button class="btn btn-p" onclick="openAdd()" style="margin-left:auto">+ 부품 추가</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>부품명</th><th>카테고리</th>
+        <th style="text-align:right">재고</th><th style="text-align:right">최소</th>
+        <th style="text-align:right">매입가</th>
+        <th style="text-align:center">상태</th><th></th>
+      </tr></thead>
+      <tbody id="inv-body">
+        <tr><td colspan="7" style="padding:20px;color:#aaa;text-align:center">
+          <div class="spinner" style="margin:0 auto"></div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 거래내역 -->
+<div id="s-hist" class="sec">
+  <div class="topbar">
+    <select id="h-type" onchange="renderHist()"><option value="">전체</option><option value="sale">판매</option><option value="in">입고</option></select>
+    <select id="h-mon" onchange="renderHist()"><option value="">전체 기간</option></select>
+    <select id="h-part" onchange="renderHist()"><option value="">전체 부품</option></select>
+  </div>
+  <div class="card"><div id="hist-list"><div class="empty">불러오는 중...</div></div></div>
+</div>
+
+<!-- 통계 -->
+<div id="s-dash" class="sec">
+  <div class="cards" id="d-metrics"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="card"><div class="card-hd">이번달 판매 TOP</div><div id="d-top"></div></div>
+    <div class="card"><div class="card-hd">재고 부족·소진</div><div id="d-low"></div></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-hd">이번달 부품별 판매량</div>
+    <div style="position:relative;height:220px"><canvas id="d-chart"></canvas></div>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="overlay" id="modal-wrap">
+<div class="modal">
+  <div class="modal-hd" id="m-title">부품 추가</div>
+  <div class="mform">
+    <input type="hidden" id="m-id">
+    <div class="fg"><label>부품명</label><input id="m-name" placeholder="예: 6205 볼베어링"></div>
+    <div class="fg"><label>카테고리</label><select id="m-cat"></select></div>
+    <div class="fg"><label>규격·메모 (선택)</label><input id="m-spec" placeholder="예: 25×52×15mm"></div>
+    <div class="g2">
+      <div class="fg"><label>현재 재고 (개)</label><input type="number" id="m-stock" value="0" min="0"></div>
+      <div class="fg"><label>최소 재고 (경고 기준)</label><input type="number" id="m-min" value="5" min="0"></div>
+    </div>
+    <div class="fg"><label>매입가 (원)</label>
+      <input type="text" id="m-buy" value="0" inputmode="numeric" oninput="fmtInput(this)" style="text-align:right">
+    </div>
+  </div>
+  <div class="modal-ft">
+    <button class="btn" onclick="closeModal()">취소</button>
+    <button class="btn btn-p" id="save-btn" onclick="savePart()">저장</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, doc,
+  onSnapshot, addDoc, updateDoc, deleteDoc,
+  serverTimestamp, query, orderBy
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB-wYELUMAs85APk_P4wRIpX216Tw50-2U",
+  authDomain: "parts-inventory-71606.firebaseapp.com",
+  projectId: "parts-inventory-71606",
+  storageBucket: "parts-inventory-71606.firebasestorage.app",
+  messagingSenderId: "216547721139",
+  appId: "1:216547721139:web:c99ed4ea1c66be198515c6"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const CATS = ['선반용','밀링용'];
+
+let parts = [];
+let hist  = [];
+let dChart = null;
+
+// ── 유틸 ──
+const today    = () => new Date().toISOString().slice(0,10);
+const ymKey    = d  => d.slice(0,7);
+const thisMonth= () => ymKey(today());
+const stOf     = p  => p.stock===0?'out':p.stock<=p.min?'low':'ok';
+const badgeSt  = s  => s==='ok'?'<span class="badge b-ok">정상</span>':s==='low'?'<span class="badge b-low">부족</span>':'<span class="badge b-out">재고없음</span>';
+
+window.fmtInput = el => {
+  const raw = el.value.replace(/[^0-9]/g,'');
+  el.value = raw ? Number(raw).toLocaleString() : '';
+};
+const parseFmt = v => parseInt((v||'0').replace(/,/g,''))||0;
+
+let toastTimer;
+const showToast = msg => {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+};
+
+const setSyncStatus = ok => {
+  document.getElementById('sync-status').innerHTML = ok
+    ? '<span class="sync-dot"></span><span style="color:#2E7D32">실시간 연동 중</span>'
+    : '<span style="color:#c0392b">⚠ 연결 오류</span>';
+};
+
+// ── Firestore 실시간 리스너 ──
+onSnapshot(
+  query(collection(db,'parts'), orderBy('name')),
+  snap => {
+    parts = snap.docs.map(d=>({...d.data(), _id: d.id}));
+    setSyncStatus(true);
+    renderQuick(); renderInv(); fillCatSelects();
+  },
+  err => { console.error(err); setSyncStatus(false); }
+);
+
+onSnapshot(
+  query(collection(db,'history'), orderBy('date','desc')),
+  snap => {
+    hist = snap.docs.map(d=>({...d.data(), _id: d.id}));
+    const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
+    if(activeTab==='거래 내역') renderHist();
+    if(activeTab==='통계') renderDash();
+  }
+);
+
+// ── 판매 / 입고 ──
+window.sell = async (id, qty) => {
+  const p=parts.find(x=>x._id===id); if(!p) return;
+  if(p.stock<qty){ showToast('재고 부족!'); return; }
+  await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
+  await addDoc(collection(db,'history'),{type:'sale',date:today(),pid:id,pname:p.name,qty,price:p.buy});
+  showToast(`판매 −${qty}  ${p.name}  (남은 재고 ${p.stock-qty}개)`);
+};
+
+window.restock = async (id, qty) => {
+  const p=parts.find(x=>x._id===id); if(!p) return;
+  await updateDoc(doc(db,'parts',id),{stock:p.stock+qty});
+  await addDoc(collection(db,'history'),{type:'in',date:today(),pid:id,pname:p.name,qty,price:p.buy});
+  showToast(`입고 +${qty}  ${p.name}  (재고 ${p.stock+qty}개)`);
+};
+
+window.setStock = async (id, val) => {
+  const p=parts.find(x=>x._id===id); if(!p) return;
+  const v=Math.max(0,parseInt(val)||0);
+  const diff=v-p.stock; if(diff===0) return;
+  await updateDoc(doc(db,'parts',id),{stock:v});
+  await addDoc(collection(db,'history'),{type:diff<0?'sale':'in',date:today(),pid:id,pname:p.name,qty:Math.abs(diff),price:p.buy});
+};
+
+// ── 렌더링 ──
+const makeRow = p => {
+  const s=stOf(p);
+  return `<div class="prow ${s}">
+    <div>
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <span class="pname">${p.name}</span>${badgeSt(s)}
+      </div>
+      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원</div>
+    </div>
+    <div class="stock-ctrl">
+      <button class="scbtn" onclick="sell('${p._id}',1)">−</button>
+      <input class="scval" type="number" value="${p.stock}" min="0"
+        onchange="setStock('${p._id}',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()">
+      <button class="scbtn" onclick="restock('${p._id}',1)">+</button>
+    </div>
+    <div class="chk-wrap">
+      <button class="chkbtn sell" onclick="sell('${p._id}',1)" title="판매 −1">↗</button>
+      <button class="chkbtn buy"  onclick="restock('${p._id}',1)" title="입고 +1">↙</button>
+    </div>
+    <span class="edit-sm" onclick="openEdit('${p._id}')">수정</span>
+  </div>`;
+};
+
+const renderQuick = () => {
+  const q  =(document.getElementById('q-search')?.value||'').toLowerCase();
+  const cat= document.getElementById('q-cat')?.value||'';
+  const st = document.getElementById('q-st')?.value||'';
+  let list = parts
+    .filter(p=>(!q||p.name.toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st))
+    .sort((a,b)=>{const o={out:0,low:1,ok:2};return o[stOf(a)]-o[stOf(b)]||a.name.localeCompare(b.name,'ko');});
+
+  const lathe = list.filter(p=>p.cat==='선반용');
+  const mill  = list.filter(p=>p.cat==='밀링용');
+  const other = list.filter(p=>p.cat!=='선반용'&&p.cat!=='밀링용');
+  let html='';
+  if(lathe.length) html+=`<div style="font-size:12px;font-weight:600;color:#6B21A8;margin:10px 0 6px;padding:0 2px">🔵 선반용</div>`+lathe.map(makeRow).join('');
+  if(mill.length)  html+=`<div style="font-size:12px;font-weight:600;color:#B45309;margin:${lathe.length?'18px':'10px'} 0 6px;padding:0 2px">🟠 밀링용</div>`+mill.map(makeRow).join('');
+  if(other.length) html+=`<div style="font-size:12px;font-weight:600;color:#555;margin:18px 0 6px;padding:0 2px">기타</div>`+other.map(makeRow).join('');
+  document.getElementById('quick-list').innerHTML = html||'<div class="empty" style="padding:1rem">해당 부품 없음</div>';
+};
+window.renderQuick = renderQuick;
+
+const renderInv = () => {
+  const q  =(document.getElementById('i-search')?.value||'').toLowerCase();
+  const cat= document.getElementById('i-cat')?.value||'';
+  const st = document.getElementById('i-st')?.value||'';
+  const list=parts.filter(p=>(!q||p.name.toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st));
+  document.getElementById('inv-body').innerHTML=list.length?list.map(p=>`
+    <tr>
+      <td>${p.name}<br><span style="font-size:11px;color:#888">${p.spec||''}</span></td>
+      <td><span class="badge b-gray" style="font-size:10px">${p.cat}</span></td>
+      <td style="text-align:right;font-weight:700">${p.stock}</td>
+      <td style="text-align:right;color:#aaa">${p.min}</td>
+      <td style="text-align:right">${p.buy.toLocaleString()}원</td>
+      <td style="text-align:center">${badgeSt(stOf(p))}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openEdit('${p._id}')">수정</button>
+        <button class="btn btn-d" style="font-size:11px;padding:4px 8px" onclick="delPart('${p._id}')">삭제</button>
+      </div></td>
+    </tr>`).join(''):'<tr><td colspan="7" style="color:#aaa;padding:16px">해당 부품 없음</td></tr>';
+};
+window.renderInv = renderInv;
+
+const renderHist = () => {
+  const ht=document.getElementById('h-type').value;
+  const hm=document.getElementById('h-mon').value;
+  const hp=document.getElementById('h-part').value;
+  const list=hist.filter(h=>(!ht||h.type===ht)&&(!hm||ymKey(h.date)===hm)&&(!hp||h.pid===hp));
+  document.getElementById('hist-list').innerHTML=list.length?list.map(h=>`
+    <div class="hist-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}">${h.type==='sale'?'판매':'입고'}</span>
+        <div><div>${h.pname}</div><div style="font-size:11px;color:#aaa">${h.date}</div></div>
+      </div>
+      <div style="font-weight:600">${h.type==='sale'?'−':'+'}${h.qty}개</div>
+    </div>`).join(''):'<div class="empty">내역 없음</div>';
+  const months=[...new Set(hist.map(h=>ymKey(h.date)))].sort().reverse();
+  const msel=document.getElementById('h-mon');const cv=msel.value;
+  msel.innerHTML='<option value="">전체 기간</option>'+months.map(m=>`<option value="${m}"${m===cv?' selected':''}>${m}</option>`).join('');
+  const psel=document.getElementById('h-part');const pv=psel.value;
+  psel.innerHTML='<option value="">전체 부품</option>'+parts.map(p=>`<option value="${p._id}"${p._id===pv?' selected':''}>${p.name}</option>`).join('');
+};
+window.renderHist = renderHist;
+
+const renderDash = () => {
+  const ms=hist.filter(h=>h.type==='sale'&&ymKey(h.date)===thisMonth());
+  const totalQ=ms.reduce((s,h)=>s+h.qty,0);
+  const totalR=ms.reduce((s,h)=>s+h.price*h.qty,0);
+  const low=parts.filter(p=>stOf(p)!=='ok').length;
+  document.getElementById('d-metrics').innerHTML=`
+    <div class="mcard"><div class="mcard-l">이번달 판매량</div><div class="mcard-v">${totalQ}개</div></div>
+    <div class="mcard"><div class="mcard-l">이번달 매출</div><div class="mcard-v">${(totalR/10000).toFixed(1)}<span style="font-size:13px;font-weight:400"> 만원</span></div></div>
+    <div class="mcard"><div class="mcard-l">전체 부품</div><div class="mcard-v">${parts.length}종</div></div>
+    <div class="mcard"><div class="mcard-l">재고 주의</div><div class="mcard-v" style="color:#c0392b">${low}종</div></div>`;
+  const map={};ms.forEach(h=>{map[h.pid]={n:h.pname,q:(map[h.pid]?.q||0)+h.qty};});
+  const top=Object.values(map).sort((a,b)=>b.q-a.q).slice(0,6);const mx=top[0]?.q||1;
+  document.getElementById('d-top').innerHTML=top.length?top.map((x,i)=>`
+    <div class="rank-row"><div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:11px;color:#aaa;min-width:14px">${i+1}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.n}</span>
+      <span style="color:#888;font-size:12px">${x.q}개</span></div>
+      <div class="bar-o" style="margin-left:20px"><div class="bar-i" style="width:${Math.round(x.q/mx*100)}%;background:#1565C0"></div></div>
+    </div>`).join(''):'<div class="empty">이번달 판매 없음</div>';
+  const low2=parts.filter(p=>stOf(p)!=='ok').sort((a,b)=>a.stock-b.stock);
+  document.getElementById('d-low').innerHTML=low2.length?low2.map(p=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:13px">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${p.name}</span>
+      <span style="margin-left:8px">${badgeSt(stOf(p))}</span></div>`).join(''):'<div class="empty">재고 부족 없음</div>';
+  const map2={};ms.forEach(h=>{map2[h.pname]=(map2[h.pname]||0)+h.qty;});
+  const labs=Object.keys(map2),vals=Object.values(map2);
+  const ctx=document.getElementById('d-chart');
+  if(dChart)dChart.destroy();
+  if(!labs.length){ctx.parentElement.innerHTML='<div class="empty" style="padding:1rem">이번달 판매 없음</div>';return;}
+  dChart=new Chart(ctx,{type:'bar',data:{labels:labs,datasets:[{label:'판매량',data:vals,backgroundColor:'#90CAF9',borderColor:'#1565C0',borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:11},autoSkip:false,maxRotation:40}},y:{ticks:{stepSize:1}}}}});
+};
+window.renderDash = renderDash;
+
+const fillCatSelects = () => {
+  const opts=CATS.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('m-cat').innerHTML=opts;
+  ['q-cat','i-cat'].forEach(id=>{
+    const el=document.getElementById(id);const cur=el.value;
+    el.innerHTML='<option value="">전체 카테고리</option>'+CATS.map(c=>`<option${c===cur?' selected':''}>${c}</option>`).join('');
+  });
+};
+window.fillCatSelects = fillCatSelects;
+
+// ── 탭 ──
+window.goTab = (id, btn) => {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='quick'){fillCatSelects();renderQuick();}
+  else if(id==='inv'){fillCatSelects();renderInv();}
+  else if(id==='hist') renderHist();
+  else if(id==='dash') renderDash();
+};
+
+// ── 모달 ──
+window.openAdd = () => {
+  document.getElementById('m-title').textContent='부품 추가';
+  document.getElementById('m-id').value='';
+  ['m-name','m-spec'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-stock').value=0;
+  document.getElementById('m-min').value=5;
+  document.getElementById('m-buy').value='0';
+  fillCatSelects();
+  document.getElementById('modal-wrap').classList.add('open');
+};
+
+window.openEdit = id => {
+  const p=parts.find(x=>x._id===id);if(!p)return;
+  document.getElementById('m-title').textContent='부품 수정';
+  document.getElementById('m-id').value=id;
+  document.getElementById('m-name').value=p.name;
+  document.getElementById('m-spec').value=p.spec||'';
+  document.getElementById('m-stock').value=p.stock;
+  document.getElementById('m-min').value=p.min;
+  document.getElementById('m-buy').value=p.buy.toLocaleString();
+  fillCatSelects();
+  document.getElementById('m-cat').value=p.cat;
+  document.getElementById('modal-wrap').classList.add('open');
+};
+
+window.closeModal = () => document.getElementById('modal-wrap').classList.remove('open');
+
+window.savePart = async () => {
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true; btn.textContent='저장 중...';
+  const id=document.getElementById('m-id').value;
+  const d={
+    name: document.getElementById('m-name').value.trim(),
+    cat:  document.getElementById('m-cat').value,
+    spec: document.getElementById('m-spec').value.trim(),
+    stock:parseInt(document.getElementById('m-stock').value)||0,
+    min:  parseInt(document.getElementById('m-min').value)||0,
+    buy:  parseFmt(document.getElementById('m-buy').value),
+    sell: 0,
+    updatedAt: serverTimestamp()
+  };
+  if(!d.name){alert('부품명을 입력하세요');btn.disabled=false;btn.textContent='저장';return;}
+  try{
+    if(id){ await updateDoc(doc(db,'parts',id),d); showToast('수정 완료!'); }
+    else { d.createdAt=serverTimestamp(); await addDoc(collection(db,'parts'),d); showToast('부품 추가 완료!'); }
+    closeModal();
+  }catch(e){alert('오류: '+e.message);}
+  btn.disabled=false; btn.textContent='저장';
+};
+
+window.delPart = async id => {
+  if(!confirm('이 부품을 삭제할까요?')) return;
+  await deleteDoc(doc(db,'parts',id));
+  showToast('삭제 완료');
+};
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+fillCatSelects();
+</script>
+</body>
+</html>
