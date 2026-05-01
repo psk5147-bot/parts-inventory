@@ -851,6 +851,10 @@ window.delPart = id => {
 };
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); confirmCancel(); } });
+
+// 모바일 첫 로드 대비 강제 렌더링
+setTimeout(()=>renderQuick(), 1000);
+setTimeout(()=>renderQuick(), 2000);
 </script>
 </body>
 </html>
