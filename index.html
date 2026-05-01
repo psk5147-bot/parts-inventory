@@ -15,8 +15,8 @@ h1{font-size:18px;font-weight:600;color:#111}
 .tab.on{color:#111;border-bottom:2px solid #111}
 .sec{display:none}.sec.on{display:block}
 .topbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-input[type=text],select{font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;outline:none}
-input[type=text]:focus,select:focus{border-color:#888}
+input[type=text],input[type=email],input[type=password],select{font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;outline:none}
+input:focus,select:focus{border-color:#888}
 .btn{padding:7px 16px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#111;font-size:13px;cursor:pointer;font-weight:500}
 .btn:hover{background:#f0f0f0}
 .btn-p{background:#111;color:#fff;border-color:#111}
@@ -24,15 +24,23 @@ input[type=text]:focus,select:focus{border-color:#888}
 .btn-d{color:#c0392b;border-color:#ddd}
 .btn-d:hover{background:#fff5f5}
 
-/* 빠른재고 - 가로 3열, 각자 세로 스크롤 */
-.quick-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;height:calc(100vh - 200px)}
+/* 로그인 화면 */
+.login-wrap{max-width:360px;margin:80px auto;background:#fff;border-radius:16px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.login-wrap h2{font-size:20px;font-weight:700;margin-bottom:6px;text-align:center}
+.login-sub{font-size:13px;color:#888;text-align:center;margin-bottom:24px}
+.login-form{display:flex;flex-direction:column;gap:10px}
+.login-form input{font-size:14px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;width:100%}
+.login-form .btn-p{padding:10px;font-size:14px;border-radius:8px;width:100%}
+.login-err{color:#c0392b;font-size:12px;text-align:center;min-height:18px}
+
+/* 빠른재고 3열 */
+.quick-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;height:calc(100vh - 210px)}
 .col-box{background:#fff;border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .col-hd{padding:10px 16px;font-size:12px;font-weight:700;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:6px;background:#fff;flex-shrink:0}
 .col-body{flex:1;overflow-y:auto;padding:8px;min-height:0}
 .col-body::-webkit-scrollbar{width:4px}
 .col-body::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
 
-/* 부품 행 */
 .prow{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border:1px solid #eee;border-radius:10px;margin-bottom:6px;transition:border-color .15s}
 .prow:hover{border-color:#bbb}
 .prow.low{border-left:3px solid #f39c12}
@@ -47,9 +55,7 @@ input[type=text]:focus,select:focus{border-color:#888}
 .scval{width:38px;text-align:center;font-size:13px;font-weight:700;padding:0;border:none;outline:none;background:#fff;color:#111}
 .edit-sm{font-size:11px;color:#bbb;cursor:pointer;padding:4px 6px;border:1px solid transparent;border-radius:5px;flex-shrink:0}
 .edit-sm:hover{border-color:#ddd;color:#555}
-
-/* 액션 피드백 */
-.action-feed{font-size:12px;padding:4px 10px;border-radius:6px;font-weight:500;opacity:0;transition:opacity .3s;white-space:nowrap;flex-shrink:0}
+.action-feed{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500;opacity:0;transition:opacity .3s;white-space:nowrap;flex-shrink:0;min-width:60px;text-align:center}
 .action-feed.show{opacity:1}
 .action-feed.sale{background:#FFEBEE;color:#C62828}
 .action-feed.restock{background:#E8F5E9;color:#2E7D32}
@@ -75,6 +81,8 @@ tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafafa}
 .hist-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eee;font-size:13px}
 .hist-row:last-child{border-bottom:none}
+
+/* 모달 */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:14px;padding:24px;width:420px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.15)}
@@ -86,6 +94,13 @@ tr:hover td{background:#fafafa}
 .fg input:focus,.fg select:focus{border-color:#888}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .modal-ft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+/* 확인 팝업 */
+.confirm-modal{background:#fff;border-radius:14px;padding:24px;width:300px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
+.confirm-title{font-size:15px;font-weight:700;margin-bottom:8px}
+.confirm-msg{font-size:13px;color:#555;margin-bottom:20px;line-height:1.5}
+.confirm-btns{display:flex;gap:8px;justify-content:center}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{opacity:1}
 .bar-o{height:6px;background:#eee;border-radius:3px;margin-top:4px}
@@ -97,11 +112,19 @@ tr:hover td{background:#fafafa}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sync-badge{font-size:11px;display:flex;align-items:center;gap:5px}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:#2E7D32;display:inline-block}
-.notif-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.user-badge{font-size:12px;background:#f0f0f0;padding:4px 10px;border-radius:20px;color:#555;display:flex;align-items:center;gap:6px}
+.notif-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555}
+.alert-banner{background:#FFEBEE;border:1px solid #FFCDD2;border-radius:10px;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:#C62828;flex-wrap:wrap}
+.alert-banner strong{font-weight:700}
+.days-left{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.days-ok{background:#E8F5E9;color:#2E7D32}
+.days-warn{background:#FFF8E1;color:#E65100}
+.days-danger{background:#FFEBEE;color:#C62828}
+.fav-btn{font-size:14px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;opacity:.4;transition:opacity .15s}
+.fav-btn.on{opacity:1}
 @media(max-width:700px){
   .quick-cols{grid-template-columns:1fr;height:auto}
-  .col-box:last-child{grid-column:auto}
   .col-body{max-height:300px}
   .cards{grid-template-columns:1fr 1fr}
   .dash-grid{grid-template-columns:1fr}
@@ -110,12 +133,34 @@ tr:hover td{background:#fafafa}
 </style>
 </head>
 <body>
+
+<!-- 로그인 화면 -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <h2>🔧 부품 재고 관리</h2>
+    <div class="login-sub">화천이티씨</div>
+    <div class="login-form">
+      <input type="email" id="login-email" placeholder="이메일" autocomplete="email">
+      <input type="password" id="login-pw" placeholder="비밀번호" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="login-err" id="login-err"></div>
+      <button class="btn btn-p" onclick="doLogin()" id="login-btn">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="main-app" style="display:none">
 <div class="app">
 
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
   <h1>부품 재고 관리</h1>
-  <div style="display:flex;align-items:center;gap:8px">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
     <button class="notif-btn" id="notif-btn" onclick="requestNotif()">🔔 알림 허용</button>
+    <div class="user-badge">
+      <span id="user-name-badge">-</span>
+      <span style="cursor:pointer;color:#888" onclick="doLogout()">로그아웃</span>
+    </div>
     <div class="sync-badge" id="sync-status">
       <div class="spinner" style="width:12px;height:12px;border-width:1.5px"></div> 연결 중...
     </div>
@@ -131,6 +176,7 @@ tr:hover td{background:#fafafa}
 
 <!-- 빠른재고 -->
 <div id="s-quick" class="sec on">
+  <div id="alert-banner" style="display:none" class="alert-banner"></div>
   <div class="topbar">
     <input type="text" id="q-search" placeholder="부품명 검색..." style="width:170px" oninput="renderQuick()">
     <select id="q-st" onchange="renderQuick()">
@@ -141,16 +187,16 @@ tr:hover td{background:#fafafa}
   </div>
   <div class="quick-cols">
     <div class="col-box">
-      <div class="col-hd" style="color:#6B21A8">🔵 선반용 <span id="lathe-count" style="color:#aaa;font-weight:400"></span></div>
-      <div class="col-body" id="col-lathe"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
+      <div class="col-hd" style="color:#6B21A8">🔵 선반용 <span id="lathe-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
+      <div class="col-body" id="col-lathe"></div>
     </div>
     <div class="col-box">
-      <div class="col-hd" style="color:#B45309">🟠 밀링용 <span id="mill-count" style="color:#aaa;font-weight:400"></span></div>
-      <div class="col-body" id="col-mill"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
+      <div class="col-hd" style="color:#B45309">🟠 밀링용 <span id="mill-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
+      <div class="col-body" id="col-mill"></div>
     </div>
     <div class="col-box">
-      <div class="col-hd" style="color:#555">📦 기타 <span id="other-count" style="color:#aaa;font-weight:400"></span></div>
-      <div class="col-body" id="col-other"><div class="empty" style="padding:1rem">부품 없음</div></div>
+      <div class="col-hd" style="color:#555">📦 기타 <span id="other-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
+      <div class="col-body" id="col-other"></div>
     </div>
   </div>
 </div>
@@ -173,9 +219,7 @@ tr:hover td{background:#fafafa}
         <th style="text-align:right">매입가</th>
         <th style="text-align:center">상태</th><th></th>
       </tr></thead>
-      <tbody id="inv-body">
-        <tr><td colspan="7" style="padding:20px;color:#aaa;text-align:center"><div class="spinner" style="margin:0 auto"></div></td></tr>
-      </tbody>
+      <tbody id="inv-body"></tbody>
     </table>
   </div>
 </div>
@@ -186,6 +230,7 @@ tr:hover td{background:#fafafa}
     <select id="h-type" onchange="renderHist()"><option value="">전체</option><option value="sale">판매</option><option value="in">입고</option></select>
     <select id="h-mon" onchange="renderHist()"><option value="">전체 기간</option></select>
     <select id="h-part" onchange="renderHist()"><option value="">전체 부품</option></select>
+    <button class="btn btn-d" style="margin-left:auto;font-size:12px" onclick="deleteAllHist()">🗑 전체 내역 삭제</button>
   </div>
   <div class="card"><div id="hist-list"><div class="empty">불러오는 중...</div></div></div>
 </div>
@@ -202,12 +247,15 @@ tr:hover td{background:#fafafa}
     <div style="position:relative;height:200px"><canvas id="d-chart-month"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-hd">월별 판매량 추이</div>
+    <div class="card-hd">월별 판매량 추이 (최근 12개월)</div>
     <div style="position:relative;height:200px"><canvas id="d-chart-trend"></canvas></div>
   </div>
 </div>
 
-<!-- 모달 -->
+</div><!-- /.app -->
+</div><!-- /#main-app -->
+
+<!-- 부품 추가/수정 모달 -->
 <div class="overlay" id="modal-wrap">
 <div class="modal">
   <div class="modal-hd" id="m-title">부품 추가</div>
@@ -231,16 +279,30 @@ tr:hover td{background:#fafafa}
 </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- 확인 팝업 -->
+<div class="overlay" id="confirm-wrap">
+<div class="confirm-modal">
+  <div class="confirm-title" id="confirm-title"></div>
+  <div class="confirm-msg" id="confirm-msg"></div>
+  <div class="confirm-btns">
+    <button class="btn" onclick="confirmCancel()">취소</button>
+    <button class="btn btn-p" id="confirm-ok-btn" onclick="confirmOk()">확인</button>
+  </div>
 </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getFirestore, collection, doc,
-  onSnapshot, addDoc, updateDoc, deleteDoc,
+  onSnapshot, addDoc, updateDoc, deleteDoc, getDocs,
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB-wYELUMAs85APk_P4wRIpX216Tw50-2U",
@@ -252,13 +314,22 @@ const firebaseConfig = {
 };
 
 const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+const db   = getFirestore(fbApp);
+const auth = getAuth(fbApp);
 const CATS = ['선반용','밀링용','기타'];
+
+// 사용자 이름 매핑
+const USER_NAMES = {
+  'mohoro@naver.com':      '대표',
+  'mixfactorydj@gmail.com':'과장',
+};
 
 let parts = [];
 let hist  = [];
 let chartMonth = null;
 let chartTrend = null;
+let currentUser = null;
+let partsLoaded = false;
 
 // ── 유틸 ──
 const today     = () => new Date().toISOString().slice(0,10);
@@ -280,12 +351,51 @@ const showToast = msg => {
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 };
-
 const setSyncStatus = ok => {
   document.getElementById('sync-status').innerHTML = ok
     ? '<span class="sync-dot"></span><span style="color:#2E7D32">실시간 연동</span>'
     : '<span style="color:#c0392b">⚠ 연결 오류</span>';
 };
+
+// ── 로그인 ──
+await setPersistence(auth, browserLocalPersistence);
+
+window.doLogin = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-pw').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  err.textContent=''; btn.disabled=true; btn.textContent='로그인 중...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+  } catch(e) {
+    err.textContent='이메일 또는 비밀번호가 틀렸어요.';
+    btn.disabled=false; btn.textContent='로그인';
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    currentUser = user;
+    const name = USER_NAMES[user.email] || user.email;
+    document.getElementById('user-name-badge').textContent = name;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
+    startListeners();
+    if(Notification.permission==='granted'){
+      document.getElementById('notif-btn').textContent='🔔 알림 ON';
+      document.getElementById('notif-btn').style.color='#2E7D32';
+    }
+  } else {
+    currentUser=null;
+    document.getElementById('login-screen').style.display='block';
+    document.getElementById('main-app').style.display='none';
+  }
+});
 
 // ── 푸시 알림 ──
 window.requestNotif = async () => {
@@ -296,7 +406,7 @@ window.requestNotif = async () => {
     document.getElementById('notif-btn').style.color='#2E7D32';
     showToast('재고 부족 시 알림이 울려요!');
   } else {
-    showToast('알림 권한이 거부됐어요. 브라우저 설정에서 허용해 주세요.');
+    showToast('브라우저 설정에서 알림을 허용해 주세요.');
   }
 };
 
@@ -306,40 +416,64 @@ const checkAndNotify = () => {
   parts.forEach(p => {
     if(stOf(p) !== 'ok' && !notifiedIds.has(p._id)){
       notifiedIds.add(p._id);
-      new Notification('⚠ 재고 부족 알림', {
-        body: `${p.name} 재고가 ${p.stock}개 남았어요!`,
-        icon: '📦'
-      });
+      new Notification('⚠ 재고 부족 알림', { body:`${p.name} 재고가 ${p.stock}개 남았어요!` });
     }
     if(stOf(p) === 'ok') notifiedIds.delete(p._id);
   });
 };
 
 // ── Firestore 리스너 ──
-onSnapshot(
-  query(collection(db,'parts'), orderBy('name')),
-  snap => {
-    parts = snap.docs.map(d=>({...d.data(), _id: d.id}));
-    setSyncStatus(true);
-    checkAndNotify();
-    renderQuick(); renderInv(); fillCatSelects();
-    const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
-    if(activeTab==='통계') renderDash();
-  },
-  err => { console.error(err); setSyncStatus(false); }
-);
+let unsubParts=null, unsubHist=null;
+function startListeners(){
+  if(unsubParts) unsubParts();
+  if(unsubHist)  unsubHist();
 
-onSnapshot(
-  query(collection(db,'history'), orderBy('date','desc')),
-  snap => {
-    hist = snap.docs.map(d=>({...d.data(), _id: d.id}));
-    const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
-    if(activeTab==='거래 내역') renderHist();
-    if(activeTab==='통계') renderDash();
-  }
-);
+  unsubParts = onSnapshot(
+    query(collection(db,'parts'), orderBy('name')),
+    snap => {
+      parts = snap.docs.map(d=>({...d.data(), _id: d.id}));
+      partsLoaded = true;
+      setSyncStatus(true);
+      checkAndNotify();
+      fillCatSelects();
+      renderQuick(); renderInv();
+      const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
+      if(activeTab==='통계') renderDash();
+    },
+    err => { console.error(err); setSyncStatus(false); }
+  );
 
-// ── 피드백 표시 ──
+  unsubHist = onSnapshot(
+    query(collection(db,'history'), orderBy('date','desc')),
+    snap => {
+      hist = snap.docs.map(d=>({...d.data(), _id: d.id}));
+      const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
+      if(activeTab==='거래 내역') renderHist();
+      if(activeTab==='통계') renderDash();
+    }
+  );
+}
+
+// ── 확인 팝업 ──
+let confirmCallback = null;
+function showConfirm(title, msg, okLabel, cb){
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent   = msg;
+  document.getElementById('confirm-ok-btn').textContent= okLabel||'확인';
+  confirmCallback = cb;
+  document.getElementById('confirm-wrap').classList.add('open');
+}
+window.confirmOk = () => {
+  document.getElementById('confirm-wrap').classList.remove('open');
+  if(confirmCallback) confirmCallback();
+  confirmCallback=null;
+};
+window.confirmCancel = () => {
+  document.getElementById('confirm-wrap').classList.remove('open');
+  confirmCallback=null;
+};
+
+// ── 피드백 ──
 const feedTimers = {};
 const showFeed = (id, type, qty) => {
   const el = document.getElementById('feed-'+id);
@@ -347,42 +481,127 @@ const showFeed = (id, type, qty) => {
   el.textContent = type==='sale' ? `판매 −${qty}개` : `입고 +${qty}개`;
   el.className = `action-feed ${type} show`;
   clearTimeout(feedTimers[id]);
-  feedTimers[id] = setTimeout(()=>{ el.classList.remove('show'); }, 1800);
+  feedTimers[id] = setTimeout(()=>el.classList.remove('show'), 2000);
 };
 
 // ── 판매 / 입고 ──
-window.sell = async (id, qty) => {
-  const p=parts.find(x=>x._id===id); if(!p) return;
-  if(p.stock<qty){ showToast('재고 부족!'); return; }
-  showFeed(id,'sale',qty);
-  await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
-  await addDoc(collection(db,'history'),{type:'sale',date:today(),pid:id,pname:p.name,qty,price:p.buy});
+window.sell = (id, qty) => {
+  const p = parts.find(x=>x._id===id); if(!p) return;
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
+  showConfirm(
+    '판매 확인',
+    `${p.name} ${qty}개를 판매 처리할까요?\n\n처리자: ${userName}`,
+    '판매',
+    async () => {
+      if(p.stock < qty){ showToast('재고 부족!'); return; }
+      showFeed(id,'sale',qty);
+      await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
+      await addDoc(collection(db,'history'),{
+        type:'sale', date:today(), pid:id, pname:p.name, qty, price:p.buy,
+        user: userName
+      });
+    }
+  );
 };
 
-window.restock = async (id, qty) => {
-  const p=parts.find(x=>x._id===id); if(!p) return;
-  showFeed(id,'restock',qty);
-  await updateDoc(doc(db,'parts',id),{stock:p.stock+qty});
-  await addDoc(collection(db,'history'),{type:'in',date:today(),pid:id,pname:p.name,qty,price:p.buy});
+window.restock = (id, qty) => {
+  const p = parts.find(x=>x._id===id); if(!p) return;
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
+  showConfirm(
+    '입고 확인',
+    `${p.name} ${qty}개를 입고 처리할까요?\n\n처리자: ${userName}`,
+    '입고',
+    async () => {
+      showFeed(id,'restock',qty);
+      await updateDoc(doc(db,'parts',id),{stock:p.stock+qty});
+      await addDoc(collection(db,'history'),{
+        type:'in', date:today(), pid:id, pname:p.name, qty, price:p.buy,
+        user: userName
+      });
+    }
+  );
 };
 
 window.setStock = async (id, val) => {
   const p=parts.find(x=>x._id===id); if(!p) return;
   const v=Math.max(0,parseInt(val)||0);
   const diff=v-p.stock; if(diff===0) return;
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
   await updateDoc(doc(db,'parts',id),{stock:v});
-  await addDoc(collection(db,'history'),{type:diff<0?'sale':'in',date:today(),pid:id,pname:p.name,qty:Math.abs(diff),price:p.buy});
+  await addDoc(collection(db,'history'),{
+    type:diff<0?'sale':'in', date:today(), pid:id, pname:p.name,
+    qty:Math.abs(diff), price:p.buy, user:userName
+  });
 };
 
-// ── 부품 행 생성 ──
+// ── 전체 내역 삭제 ──
+window.deleteAllHist = () => {
+  showConfirm(
+    '전체 내역 삭제',
+    '모든 거래 내역을 삭제할까요?\n통계도 초기화돼요. 되돌릴 수 없어요.',
+    '전체 삭제',
+    async () => {
+      const snap = await getDocs(collection(db,'history'));
+      await Promise.all(snap.docs.map(d=>deleteDoc(d.ref)));
+      showToast('전체 내역 삭제 완료');
+    }
+  );
+};
+
+// ── 렌더링 ──
+let favorites = JSON.parse(localStorage.getItem('fav_parts')||'[]');
+const saveFavs = () => localStorage.setItem('fav_parts', JSON.stringify(favorites));
+window.toggleFav = id => {
+  if(favorites.includes(id)) favorites=favorites.filter(x=>x!==id);
+  else favorites.push(id);
+  saveFavs(); renderQuick();
+};
+
+// 평균 소진 속도 계산 (최근 3개월 판매 기반)
+const getAvgMonthly = pid => {
+  const d=new Date(); d.setDate(1);
+  const months=[];
+  for(let i=0;i<3;i++){
+    const dd=new Date(d); dd.setMonth(dd.getMonth()-i);
+    months.push(`${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}`);
+  }
+  const total=hist.filter(h=>h.type==='sale'&&h.pid===pid&&months.includes(ymKey(h.date))).reduce((s,h)=>s+h.qty,0);
+  return total/3;
+};
+
+const getDaysLeft = (stock, avgPerMonth) => {
+  if(avgPerMonth<=0) return null;
+  return Math.round(stock/(avgPerMonth/30));
+};
+
+// 재고부족 알림 배너
+const renderAlertBanner = () => {
+  const urgent = parts.filter(p=>stOf(p)!=='ok');
+  const banner = document.getElementById('alert-banner');
+  if(!banner) return;
+  if(!urgent.length){ banner.style.display='none'; return; }
+  banner.style.display='flex';
+  banner.innerHTML=`<span>⚠️</span><strong>주문 필요 ${urgent.length}종</strong><span style="color:#888;font-size:12px">→</span>`
+    +urgent.map(p=>`<span style="background:#fff;border:1px solid #FFCDD2;border-radius:6px;padding:2px 8px;font-size:12px">${p.name} (${p.stock}개)</span>`).join('');
+};
+
 const makeRow = p => {
   const s = stOf(p);
+  const isFav = favorites.includes(p._id);
+  const avg = getAvgMonthly(p._id);
+  const days = getDaysLeft(p.stock, avg);
+  let daysHtml='';
+  if(days!==null){
+    const cls=days<=7?'days-danger':days<=30?'days-warn':'days-ok';
+    daysHtml=`<span class="days-left ${cls}">약 ${days}일치</span>`;
+  }
   return `<div class="prow ${s}">
+    <button class="fav-btn ${isFav?'on':''}" onclick="toggleFav('${p._id}')" title="즐겨찾기">⭐</button>
     <div class="pinfo">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span class="pname">${p.name}</span>${badgeSt(s)}
+        <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
       </div>
-      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원</div>
+      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}</div>
     </div>
     <div id="feed-${p._id}" class="action-feed"></div>
     <div class="stock-ctrl">
@@ -396,30 +615,34 @@ const makeRow = p => {
   </div>`;
 };
 
-// ── 빠른재고 렌더 ──
 const renderQuick = () => {
+  if(!partsLoaded) return;
   const q  = (document.getElementById('q-search')?.value||'').toLowerCase();
   const st = document.getElementById('q-st')?.value||'';
-  const sortFn = (a,b) => { const o={out:0,low:1,ok:2}; return o[stOf(a)]-o[stOf(b)]||a.name.localeCompare(b.name,'ko'); };
-
-  const filter = p => (!q||p.name.toLowerCase().includes(q))&&(!st||stOf(p)===st);
+  // 즐겨찾기 → 재고부족 → 가나다 순
+  const sortFn = (a,b)=>{
+    const fa=favorites.includes(a._id)?0:1;
+    const fb=favorites.includes(b._id)?0:1;
+    if(fa!==fb) return fa-fb;
+    const o={out:0,low:1,ok:2};
+    return o[stOf(a)]-o[stOf(b)]||a.name.localeCompare(b.name,'ko');
+  };
+  const filter = p=>(!q||p.name.toLowerCase().includes(q))&&(!st||stOf(p)===st);
 
   const lathe = parts.filter(p=>p.cat==='선반용'&&filter(p)).sort(sortFn);
   const mill  = parts.filter(p=>p.cat==='밀링용'&&filter(p)).sort(sortFn);
   const other = parts.filter(p=>p.cat==='기타'&&filter(p)).sort(sortFn);
 
-  document.getElementById('lathe-count').textContent = `${lathe.length}종`;
-  document.getElementById('mill-count').textContent  = `${mill.length}종`;
-
-  document.getElementById('col-lathe').innerHTML = lathe.length ? lathe.map(makeRow).join('') : '<div class="empty" style="padding:1rem">부품 없음</div>';
-  document.getElementById('col-mill').innerHTML  = mill.length  ? mill.map(makeRow).join('')  : '<div class="empty" style="padding:1rem">부품 없음</div>';
-
+  renderAlertBanner();
+  document.getElementById('lathe-count').textContent=`${lathe.length}종`;
+  document.getElementById('mill-count').textContent=`${mill.length}종`;
   document.getElementById('other-count').textContent=`${other.length}종`;
+  document.getElementById('col-lathe').innerHTML=lathe.length?lathe.map(makeRow).join(''):'<div class="empty" style="padding:1rem">부품 없음</div>';
+  document.getElementById('col-mill').innerHTML=mill.length?mill.map(makeRow).join(''):'<div class="empty" style="padding:1rem">부품 없음</div>';
   document.getElementById('col-other').innerHTML=other.length?other.map(makeRow).join(''):'<div class="empty" style="padding:1rem">부품 없음</div>';
 };
 window.renderQuick = renderQuick;
 
-// ── 재고현황 ──
 const renderInv = () => {
   const q  =(document.getElementById('i-search')?.value||'').toLowerCase();
   const cat= document.getElementById('i-cat')?.value||'';
@@ -441,7 +664,6 @@ const renderInv = () => {
 };
 window.renderInv = renderInv;
 
-// ── 거래내역 ──
 const renderHist = () => {
   const ht=document.getElementById('h-type').value;
   const hm=document.getElementById('h-mon').value;
@@ -451,9 +673,15 @@ const renderHist = () => {
     <div class="hist-row">
       <div style="display:flex;align-items:center;gap:8px">
         <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}">${h.type==='sale'?'판매':'입고'}</span>
-        <div><div>${h.pname}</div><div style="font-size:11px;color:#aaa">${h.date}</div></div>
+        <div>
+          <div>${h.pname} <span style="font-size:11px;color:#aaa;margin-left:4px">${h.user||''}</span></div>
+          <div style="font-size:11px;color:#aaa">${h.date}</div>
+        </div>
       </div>
-      <div style="font-weight:600">${h.type==='sale'?'−':'+'}${h.qty}개</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-weight:600">${h.type==='sale'?'−':'+'}${h.qty}개</div>
+        <button onclick="deleteHist('${h._id}')" style="font-size:11px;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px" onmouseover="this.style.color='#c0392b'" onmouseout="this.style.color='#aaa'">삭제</button>
+      </div>
     </div>`).join(''):'<div class="empty">내역 없음</div>';
   const months=[...new Set(hist.map(h=>ymKey(h.date)))].sort().reverse();
   const msel=document.getElementById('h-mon');const cv=msel.value;
@@ -463,22 +691,16 @@ const renderHist = () => {
 };
 window.renderHist = renderHist;
 
-// ── 통계 ──
 const renderDash = () => {
-  // 판매 데이터만 (입고 제외)
   const allSales = hist.filter(h=>h.type==='sale');
   const ms = allSales.filter(h=>ymKey(h.date)===thisMonth());
-  const totalQ = ms.reduce((s,h)=>s+h.qty,0);
-  const totalR = ms.reduce((s,h)=>s+(h.price||0)*h.qty,0);
-  const low = parts.filter(p=>stOf(p)!=='ok').length;
-
+  const totalQ=ms.reduce((s,h)=>s+h.qty,0);
+  const low=parts.filter(p=>stOf(p)!=='ok').length;
   document.getElementById('d-metrics').innerHTML=`
     <div class="mcard"><div class="mcard-l">이번달 판매량</div><div class="mcard-v">${totalQ}개</div></div>
-    <div class="mcard"><div class="mcard-l">이번달 매출</div><div class="mcard-v">${(totalR/10000).toFixed(1)}<span style="font-size:13px;font-weight:400"> 만원</span></div></div>
     <div class="mcard"><div class="mcard-l">전체 부품</div><div class="mcard-v">${parts.length}종</div></div>
-    <div class="mcard"><div class="mcard-l">재고 주의</div><div class="mcard-v" style="color:#c0392b">${low}종</div></div>`;
-
-  // 이번달 TOP
+    <div class="mcard"><div class="mcard-l">재고 주의</div><div class="mcard-v" style="color:#c0392b">${low}종</div></div>
+    <div class="mcard"><div class="mcard-l">이번달 판매 종류</div><div class="mcard-v">${[...new Set(ms.map(h=>h.pid))].length}종</div></div>`;
   const map={};ms.forEach(h=>{map[h.pid]={n:h.pname,q:(map[h.pid]?.q||0)+h.qty};});
   const top=Object.values(map).sort((a,b)=>b.q-a.q).slice(0,6);const mx=top[0]?.q||1;
   document.getElementById('d-top').innerHTML=top.length?top.map((x,i)=>`
@@ -488,41 +710,43 @@ const renderDash = () => {
       <span style="color:#888;font-size:12px">${x.q}개</span></div>
       <div class="bar-o" style="margin-left:20px"><div class="bar-i" style="width:${Math.round(x.q/mx*100)}%;background:#1565C0"></div></div>
     </div>`).join(''):'<div class="empty">이번달 판매 없음</div>';
-
-  // 재고 부족
   const low2=parts.filter(p=>stOf(p)!=='ok').sort((a,b)=>a.stock-b.stock);
   document.getElementById('d-low').innerHTML=low2.length?low2.map(p=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:13px">
       <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${p.name}</span>
       <span style="margin-left:8px">${badgeSt(stOf(p))}</span></div>`).join(''):'<div class="empty">재고 부족 없음</div>';
 
-  // 이번달 부품별 차트
+  // 이번달 부품별 판매량
   const map2={};ms.forEach(h=>{map2[h.pname]=(map2[h.pname]||0)+h.qty;});
   const labs=Object.keys(map2),vals=Object.values(map2);
   const ctx1=document.getElementById('d-chart-month');
   if(chartMonth)chartMonth.destroy();
   if(!labs.length){ctx1.parentElement.innerHTML='<div class="empty" style="padding:1rem">이번달 판매 없음</div>';}
-  else {
-    chartMonth=new Chart(ctx1,{type:'bar',data:{labels:labs,datasets:[{label:'판매량',data:vals,backgroundColor:'#90CAF9',borderColor:'#1565C0',borderWidth:1}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{font:{size:11},autoSkip:false,maxRotation:40}},y:{ticks:{stepSize:1}}}}});
-  }
+  else chartMonth=new Chart(ctx1,{type:'bar',data:{labels:labs,datasets:[{label:'판매량(개)',data:vals,backgroundColor:'#90CAF9',borderColor:'#1565C0',borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}개`}}},
+    scales:{x:{ticks:{font:{size:11},autoSkip:false,maxRotation:40}},y:{ticks:{stepSize:1},title:{display:true,text:'판매 수량(개)',font:{size:11}}}}}});
 
-  // 월별 추이 차트 (판매만)
-  const monthSet=[...new Set(allSales.map(h=>ymKey(h.date)))].sort();
+  // 월별 판매량 추이 (최근 12개월 항상 표시)
+  const monthSet=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth()-i);
+    monthSet.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  const monthLabels=monthSet.map(m=>{const [y,mo]=m.split('-');return `${y}.${mo}`;});
   const monthVals=monthSet.map(m=>allSales.filter(h=>ymKey(h.date)===m).reduce((s,h)=>s+h.qty,0));
   const ctx2=document.getElementById('d-chart-trend');
   if(chartTrend)chartTrend.destroy();
   if(!monthSet.length){ctx2.parentElement.innerHTML='<div class="empty" style="padding:1rem">판매 내역 없음</div>';}
-  else {
-    chartTrend=new Chart(ctx2,{type:'bar',data:{labels:monthSet,datasets:[{label:'월별 판매량',data:monthVals,backgroundColor:'#A5D6A7',borderColor:'#2E7D32',borderWidth:1}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{font:{size:11}}},y:{ticks:{stepSize:1}}}}});
-  }
+  else chartTrend=new Chart(ctx2,{type:'bar',
+    data:{labels:monthLabels,datasets:[{label:'월별 판매량(개)',data:monthVals,backgroundColor:monthSet.map(m=>m===thisMonth()?'#1565C0':'#A5D6A7'),borderColor:monthSet.map(m=>m===thisMonth()?'#0D47A1':'#2E7D32'),borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}개`}}},
+      scales:{x:{ticks:{font:{size:11}}},y:{ticks:{stepSize:1},title:{display:true,text:'판매 수량(개)',font:{size:11}}}}}});
 };
 window.renderDash = renderDash;
 
-// ── 카테고리 셀렉트 ──
 const fillCatSelects = () => {
   const opts=CATS.map(c=>`<option>${c}</option>`).join('');
   document.getElementById('m-cat').innerHTML=opts;
@@ -531,7 +755,6 @@ const fillCatSelects = () => {
 };
 window.fillCatSelects = fillCatSelects;
 
-// ── 탭 ──
 window.goTab = (id, btn) => {
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -543,7 +766,6 @@ window.goTab = (id, btn) => {
   else if(id==='dash') renderDash();
 };
 
-// ── 모달 ──
 window.openAdd = () => {
   document.getElementById('m-title').textContent='부품 추가';
   document.getElementById('m-id').value='';
@@ -582,8 +804,7 @@ window.savePart = async () => {
     stock:parseInt(document.getElementById('m-stock').value)||0,
     min:  parseInt(document.getElementById('m-min').value)||0,
     buy:  parseFmt(document.getElementById('m-buy').value),
-    sell: 0,
-    updatedAt: serverTimestamp()
+    sell: 0, updatedAt: serverTimestamp()
   };
   if(!d.name){alert('부품명을 입력하세요');btn.disabled=false;btn.textContent='저장';return;}
   try{
@@ -594,21 +815,19 @@ window.savePart = async () => {
   btn.disabled=false; btn.textContent='저장';
 };
 
-window.delPart = async id => {
-  if(!confirm('이 부품을 삭제할까요?')) return;
-  await deleteDoc(doc(db,'parts',id));
-  showToast('삭제 완료');
+window.deleteHist = id => {
+  showConfirm('내역 삭제','이 거래 내역을 삭제할까요?','삭제', async()=>{
+    await deleteDoc(doc(db,'history',id));
+    showToast('내역 삭제 완료');
+  });
+};
+  showConfirm('부품 삭제','이 부품을 삭제할까요?','삭제', async()=>{
+    await deleteDoc(doc(db,'parts',id));
+    showToast('삭제 완료');
+  });
 };
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-
-// 알림 이미 허용된 경우 버튼 상태 업데이트
-if(Notification.permission==='granted'){
-  document.getElementById('notif-btn').textContent='🔔 알림 ON';
-  document.getElementById('notif-btn').style.color='#2E7D32';
-}
-
-fillCatSelects();
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); confirmCancel(); } });
 </script>
 </body>
 </html>
