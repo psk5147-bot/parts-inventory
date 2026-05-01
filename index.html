@@ -121,8 +121,9 @@ tr:hover td{background:#fafafa}
 .days-ok{background:#E8F5E9;color:#2E7D32}
 .days-warn{background:#FFF8E1;color:#E65100}
 .days-danger{background:#FFEBEE;color:#C62828}
-.fav-btn{font-size:16px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;opacity:.25;transition:all .15s;filter:grayscale(100%)}
-.fav-btn.on{opacity:1;filter:none;transform:scale(1.2)}
+.fav-btn{font-size:16px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;transition:all .15s}
+.fav-btn.on{transform:scale(1.2)}
+.fav-btn.off{opacity:.25;filter:grayscale(100%)}
 @media(max-width:700px){
   .quick-cols{grid-template-columns:1fr;height:auto}
   .col-body{max-height:300px}
@@ -557,8 +558,8 @@ const loadFavs = async () => {
   try {
     const snap = await getDoc(FAV_DOC());
     if(snap.exists()) favorites = snap.data().ids||[];
-    renderQuick();
   } catch(e){ favorites=[]; }
+  renderQuick();
 };
 
 const saveFavs = async () => {
@@ -612,7 +613,7 @@ const makeRow = p => {
     daysHtml=`<span class="days-left ${cls}">약 ${days}일치</span>`;
   }
   return `<div class="prow ${s}">
-    <button class="fav-btn ${isFav?'on':''}" onclick="toggleFav('${p._id}')" title="즐겨찾기">⭐</button>
+    <button class="fav-btn ${isFav?'on':'off'}" onclick="toggleFav('${p._id}')" title="즐겨찾기">${isFav?'❤️':'🤍'}</button>
     <div class="pinfo">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
