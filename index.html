@@ -438,7 +438,7 @@ function startListeners(){
       setSyncStatus(true);
       checkAndNotify();
       fillCatSelects();
-      tryRender(); renderInv();
+      renderQuick(); renderInv();
       const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
       if(activeTab==='통계') renderDash();
     },
@@ -554,7 +554,6 @@ window.deleteAllHist = () => {
 let favorites = [];
 let favsLoaded = false;
 const FAV_DOC = () => doc(db,'settings','favorites');
-const tryRender = () => { if(partsLoaded && favsLoaded) renderQuick(); };
 
 const loadFavs = async () => {
   try {
@@ -562,7 +561,7 @@ const loadFavs = async () => {
     if(snap.exists()) favorites = snap.data().ids||[];
   } catch(e){ favorites=[]; }
   favsLoaded = true;
-  tryRender();
+  if(partsLoaded) renderQuick();
 };
 
 const saveFavs = async () => {
