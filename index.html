@@ -121,8 +121,8 @@ tr:hover td{background:#fafafa}
 .days-ok{background:#E8F5E9;color:#2E7D32}
 .days-warn{background:#FFF8E1;color:#E65100}
 .days-danger{background:#FFEBEE;color:#C62828}
-.fav-btn{font-size:14px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;opacity:.4;transition:opacity .15s}
-.fav-btn.on{opacity:1}
+.fav-btn{font-size:16px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;opacity:.25;transition:all .15s;filter:grayscale(100%)}
+.fav-btn.on{opacity:1;filter:none;transform:scale(1.2)}
 @media(max-width:700px){
   .quick-cols{grid-template-columns:1fr;height:auto}
   .col-body{max-height:300px}
@@ -297,7 +297,7 @@ tr:hover td{background:#fafafa}
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getFirestore, collection, doc,
-  onSnapshot, addDoc, updateDoc, deleteDoc, getDocs,
+  onSnapshot, addDoc, updateDoc, deleteDoc, getDocs, getDoc, setDoc,
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
@@ -427,6 +427,7 @@ let unsubParts=null, unsubHist=null;
 function startListeners(){
   if(unsubParts) unsubParts();
   if(unsubHist)  unsubHist();
+  loadFavs();
 
   unsubParts = onSnapshot(
     query(collection(db,'parts'), orderBy('name')),
@@ -549,12 +550,27 @@ window.deleteAllHist = () => {
 };
 
 // ── 렌더링 ──
-let favorites = JSON.parse(localStorage.getItem('fav_parts')||'[]');
-const saveFavs = () => localStorage.setItem('fav_parts', JSON.stringify(favorites));
-window.toggleFav = id => {
+let favorites = [];
+const FAV_DOC = () => doc(db,'settings','favorites');
+
+const loadFavs = async () => {
+  try {
+    const snap = await getDoc(FAV_DOC());
+    if(snap.exists()) favorites = snap.data().ids||[];
+    renderQuick();
+  } catch(e){ favorites=[]; }
+};
+
+const saveFavs = async () => {
+  try { await setDoc(FAV_DOC(), {ids: favorites}); }
+  catch(e){ console.error(e); }
+};
+
+window.toggleFav = async id => {
   if(favorites.includes(id)) favorites=favorites.filter(x=>x!==id);
   else favorites.push(id);
-  saveFavs(); renderQuick();
+  await saveFavs();
+  renderQuick();
 };
 
 // 평균 소진 속도 계산 (최근 3개월 판매 기반)
