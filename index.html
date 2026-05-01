@@ -189,15 +189,15 @@ tr:hover td{background:#fafafa}
   <div class="quick-cols">
     <div class="col-box">
       <div class="col-hd" style="color:#6B21A8">🔵 선반용 <span id="lathe-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-lathe"></div>
+      <div class="col-body" id="col-lathe"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
     </div>
     <div class="col-box">
       <div class="col-hd" style="color:#B45309">🟠 밀링용 <span id="mill-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-mill"></div>
+      <div class="col-body" id="col-mill"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
     </div>
     <div class="col-box">
       <div class="col-hd" style="color:#555">📦 기타 <span id="other-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-other"></div>
+      <div class="col-body" id="col-other"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
     </div>
   </div>
 </div>
@@ -438,7 +438,7 @@ function startListeners(){
       setSyncStatus(true);
       checkAndNotify();
       fillCatSelects();
-      renderQuick(); renderInv();
+      tryRender(); renderInv();
       const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
       if(activeTab==='통계') renderDash();
     },
@@ -552,14 +552,17 @@ window.deleteAllHist = () => {
 
 // ── 렌더링 ──
 let favorites = [];
+let favsLoaded = false;
 const FAV_DOC = () => doc(db,'settings','favorites');
+const tryRender = () => { if(partsLoaded && favsLoaded) renderQuick(); };
 
 const loadFavs = async () => {
   try {
     const snap = await getDoc(FAV_DOC());
     if(snap.exists()) favorites = snap.data().ids||[];
   } catch(e){ favorites=[]; }
-  renderQuick();
+  favsLoaded = true;
+  tryRender();
 };
 
 const saveFavs = async () => {
