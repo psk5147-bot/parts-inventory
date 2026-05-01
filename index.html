@@ -445,6 +445,9 @@ function startListeners(){
     err => { console.error(err); setSyncStatus(false); }
   );
 
+  // 모바일 대비 3초 후 강제 렌더링
+  setTimeout(()=>{ if(!partsLoaded){ renderQuick(); } }, 3000);
+
   unsubHist = onSnapshot(
     query(collection(db,'history'), orderBy('date','desc')),
     snap => {
