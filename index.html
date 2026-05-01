@@ -429,8 +429,8 @@ async function startListeners(){
   if(unsubParts) unsubParts();
   if(unsubHist)  unsubHist();
 
-  // 즐겨찾기 로드
-  await loadFavs();
+  // 즐겨찾기는 백그라운드로 로드
+  loadFavs();
 
   // 실시간 리스너
   unsubParts = onSnapshot(
