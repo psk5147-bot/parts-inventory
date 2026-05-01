@@ -189,15 +189,15 @@ tr:hover td{background:#fafafa}
   <div class="quick-cols">
     <div class="col-box">
       <div class="col-hd" style="color:#6B21A8">🔵 선반용 <span id="lathe-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-lathe"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
+      <div class="col-body" id="col-lathe"></div>
     </div>
     <div class="col-box">
       <div class="col-hd" style="color:#B45309">🟠 밀링용 <span id="mill-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-mill"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
+      <div class="col-body" id="col-mill"></div>
     </div>
     <div class="col-box">
       <div class="col-hd" style="color:#555">📦 기타 <span id="other-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
-      <div class="col-body" id="col-other"><div style="display:flex;align-items:center;gap:8px;padding:20px;color:#aaa;font-size:13px"><div class="spinner"></div> 불러오는 중...</div></div>
+      <div class="col-body" id="col-other"></div>
     </div>
   </div>
 </div>
@@ -429,19 +429,8 @@ async function startListeners(){
   if(unsubParts) unsubParts();
   if(unsubHist)  unsubHist();
 
-  // 즐겨찾기 먼저 로드 완료 후 진행
+  // 즐겨찾기 로드
   await loadFavs();
-
-  // 먼저 강제로 한번 가져오기 (모바일 대비)
-  try {
-    const snap = await getDocs(query(collection(db,'parts'), orderBy('name')));
-    parts = snap.docs.map(d=>({...d.data(), _id: d.id}));
-    partsLoaded = true;
-    setSyncStatus(true);
-    checkAndNotify();
-    fillCatSelects();
-    renderQuick(); renderInv();
-  } catch(e){ console.error(e); }
 
   // 실시간 리스너
   unsubParts = onSnapshot(
@@ -458,9 +447,6 @@ async function startListeners(){
     },
     err => { console.error(err); setSyncStatus(false); }
   );
-
-  // 모바일 대비 3초 후 강제 렌더링
-  setTimeout(()=>{ if(!partsLoaded){ renderQuick(); } }, 3000);
 
   unsubHist = onSnapshot(
     query(collection(db,'history'), orderBy('date','desc')),
