@@ -821,6 +821,8 @@ window.deleteHist = id => {
     showToast('내역 삭제 완료');
   });
 };
+
+window.delPart = id => {
   showConfirm('부품 삭제','이 부품을 삭제할까요?','삭제', async()=>{
     await deleteDoc(doc(db,'parts',id));
     showToast('삭제 완료');
