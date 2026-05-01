@@ -428,7 +428,9 @@ let unsubParts=null, unsubHist=null;
 async function startListeners(){
   if(unsubParts) unsubParts();
   if(unsubHist)  unsubHist();
-  loadFavs();
+
+  // 즐겨찾기 먼저 로드 완료 후 진행
+  await loadFavs();
 
   // 먼저 강제로 한번 가져오기 (모바일 대비)
   try {
@@ -576,7 +578,6 @@ const loadFavs = async () => {
     if(snap.exists()) favorites = snap.data().ids||[];
   } catch(e){ favorites=[]; }
   favsLoaded = true;
-  if(partsLoaded) renderQuick();
 };
 
 const saveFavs = async () => {
