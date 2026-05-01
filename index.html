@@ -425,7 +425,7 @@ const checkAndNotify = () => {
 
 // ── Firestore 리스너 ──
 let unsubParts=null, unsubHist=null;
-function startListeners(){
+async function startListeners(){
   if(unsubParts) unsubParts();
   if(unsubHist)  unsubHist();
   loadFavs();
