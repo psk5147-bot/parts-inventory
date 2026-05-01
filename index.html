@@ -430,6 +430,18 @@ function startListeners(){
   if(unsubHist)  unsubHist();
   loadFavs();
 
+  // 먼저 강제로 한번 가져오기 (모바일 대비)
+  try {
+    const snap = await getDocs(query(collection(db,'parts'), orderBy('name')));
+    parts = snap.docs.map(d=>({...d.data(), _id: d.id}));
+    partsLoaded = true;
+    setSyncStatus(true);
+    checkAndNotify();
+    fillCatSelects();
+    renderQuick(); renderInv();
+  } catch(e){ console.error(e); }
+
+  // 실시간 리스너
   unsubParts = onSnapshot(
     query(collection(db,'parts'), orderBy('name')),
     snap => {
