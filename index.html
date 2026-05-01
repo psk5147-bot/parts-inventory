@@ -247,7 +247,7 @@ tr:hover td{background:#fafafa}
     <div style="position:relative;height:200px"><canvas id="d-chart-month"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-hd">월별 판매량 추이 (최근 12개월)</div>
+    <div class="card-hd" id="trend-title">월별 판매량 추이</div>
     <div style="position:relative;height:200px"><canvas id="d-chart-trend"></canvas></div>
   </div>
 </div>
@@ -726,21 +726,19 @@ const renderDash = () => {
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}개`}}},
     scales:{x:{ticks:{font:{size:11},autoSkip:false,maxRotation:40}},y:{ticks:{stepSize:1},title:{display:true,text:'판매 수량(개)',font:{size:11}}}}}});
 
-  // 월별 판매량 추이 (최근 12개월 항상 표시)
-  const monthSet=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date();
-    d.setDate(1);
-    d.setMonth(d.getMonth()-i);
-    monthSet.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
-  }
-  const monthLabels=monthSet.map(m=>{const [y,mo]=m.split('-');return `${y}.${mo}`;});
-  const monthVals=monthSet.map(m=>allSales.filter(h=>ymKey(h.date)===m).reduce((s,h)=>s+h.qty,0));
+  // 월별 판매량 추이 (1월~12월 고정)
+  const currentYear = new Date().getFullYear();
+  const monthSet = Array.from({length:12},(_,i)=>`${currentYear}-${String(i+1).padStart(2,'0')}`);
+  const monthLabels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const monthVals = monthSet.map(m=>allSales.filter(h=>ymKey(h.date)===m).reduce((s,h)=>s+h.qty,0));
+  const trendTitle = document.getElementById('trend-title');
+  if(trendTitle) trendTitle.textContent = `${currentYear}년 월별 판매량`;
   const ctx2=document.getElementById('d-chart-trend');
   if(chartTrend)chartTrend.destroy();
-  if(!monthSet.length){ctx2.parentElement.innerHTML='<div class="empty" style="padding:1rem">판매 내역 없음</div>';}
-  else chartTrend=new Chart(ctx2,{type:'bar',
-    data:{labels:monthLabels,datasets:[{label:'월별 판매량(개)',data:monthVals,backgroundColor:monthSet.map(m=>m===thisMonth()?'#1565C0':'#A5D6A7'),borderColor:monthSet.map(m=>m===thisMonth()?'#0D47A1':'#2E7D32'),borderWidth:1}]},
+  chartTrend=new Chart(ctx2,{type:'bar',
+    data:{labels:monthLabels,datasets:[{label:'판매량(개)',data:monthVals,
+      backgroundColor:monthSet.map(m=>m===thisMonth()?'#1565C0':'#A5D6A7'),
+      borderColor:monthSet.map(m=>m===thisMonth()?'#0D47A1':'#2E7D32'),borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}개`}}},
       scales:{x:{ticks:{font:{size:11}}},y:{ticks:{stepSize:1},title:{display:true,text:'판매 수량(개)',font:{size:11}}}}}});
