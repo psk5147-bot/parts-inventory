@@ -635,7 +635,6 @@ const makeRow = p => {
 };
 
 const renderQuick = () => {
-  if(!partsLoaded) return;
   const q  = (document.getElementById('q-search')?.value||'').toLowerCase();
   const st = document.getElementById('q-st')?.value||'';
   // 즐겨찾기 → 재고부족 → 가나다 순
