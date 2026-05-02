@@ -126,9 +126,9 @@ tr:hover td{background:#fafafa}
 .days-ok{background:#E8F5E9;color:#2E7D32}
 .days-warn{background:#FFF8E1;color:#E65100}
 .days-danger{background:#FFEBEE;color:#C62828}
-.fav-btn{font-size:16px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;transition:all .15s}
-.fav-btn.on{transform:scale(1.2)}
-.fav-btn.off{opacity:.25;filter:grayscale(100%)}
+.fav-btn{font-size:14px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;transition:all .15s;line-height:1}
+.fav-btn.on{filter:none}
+.fav-btn.off{filter:grayscale(100%) brightness(1.8);opacity:.4}
 @media(max-width:700px){
   .quick-cols{grid-template-columns:1fr;height:auto}
   .col-body{max-height:300px}
@@ -622,7 +622,7 @@ const makeRow = p => {
     daysHtml=`<span class="days-left ${cls}">약 ${days}일치</span>`;
   }
   return `<div class="prow ${s}">
-    <button class="fav-btn ${isFav?'on':'off'}" onclick="toggleFav('${p._id}')" title="즐겨찾기">${isFav?'❤️':'🤍'}</button>
+    <button class="fav-btn ${isFav?'on':'off'}" onclick="toggleFav('${p._id}')" title="즐겨찾기">⭐</button>
     <div class="pinfo">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
