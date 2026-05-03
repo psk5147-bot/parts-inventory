@@ -692,11 +692,23 @@ const renderQuick = () => {
   const st = document.getElementById('q-st')?.value||'';
   // 즐겨찾기 → 재고부족 → 가나다 순
   const sortFn = (a,b)=>{
+    // 즐겨찾기 우선
     const fa=favorites.includes(a._id)?0:1;
     const fb=favorites.includes(b._id)?0:1;
     if(fa!==fb) return fa-fb;
-    const o={out:0,low:1,ok:2};
-    return o[stOf(a)]-o[stOf(b)]||a.name.localeCompare(b.name,'ko');
+    // 재고부족 우선
+    const o={out:0,low:1,ok:2,ondemand:3};
+    if(o[stOf(a)]!==o[stOf(b)]) return o[stOf(a)]-o[stOf(b)];
+    // 부품명에서 숫자 추출해서 오름차순
+    const numA = parseInt(a.name.match(/\d+/)?.[0]||'0');
+    const numB = parseInt(b.name.match(/\d+/)?.[0]||'0');
+    if(numA!==numB) return numA-numB;
+    // 신형 > 구형 순서
+    const newA = a.name.includes('신형')?0:a.name.includes('구형')?1:2;
+    const newB = b.name.includes('신형')?0:b.name.includes('구형')?1:2;
+    if(newA!==newB) return newA-newB;
+    // 나머지는 가나다순
+    return a.name.localeCompare(b.name,'ko');
   };
   const filter = p=>(!q||p.name.toLowerCase().includes(q))&&(!st||stOf(p)===st);
 
