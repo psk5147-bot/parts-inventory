@@ -784,7 +784,7 @@ const renderDash = () => {
   const allSales = hist.filter(h=>h.type==='sale');
   const ms = allSales.filter(h=>ymKey(h.date)===thisMonth());
   const totalQ=ms.reduce((s,h)=>s+h.qty,0);
-  const low=parts.filter(p=>stOf(p)!=='ok').length;
+  const low=parts.filter(p=>stOf(p)!=='ok'&&!p.ondemand).length;
   document.getElementById('d-metrics').innerHTML=`
     <div class="mcard"><div class="mcard-l">이번달 판매량</div><div class="mcard-v">${totalQ}개</div></div>
     <div class="mcard"><div class="mcard-l">전체 부품</div><div class="mcard-v">${parts.length}종</div></div>
@@ -799,7 +799,7 @@ const renderDash = () => {
       <span style="color:#888;font-size:12px">${x.q}개</span></div>
       <div class="bar-o" style="margin-left:20px"><div class="bar-i" style="width:${Math.round(x.q/mx*100)}%;background:#1565C0"></div></div>
     </div>`).join(''):'<div class="empty">이번달 판매 없음</div>';
-  const low2=parts.filter(p=>stOf(p)!=='ok').sort((a,b)=>a.stock-b.stock);
+  const low2=parts.filter(p=>stOf(p)!=='ok'&&!p.ondemand).sort((a,b)=>a.stock-b.stock);
   document.getElementById('d-low').innerHTML=low2.length?low2.map(p=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:13px">
       <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${p.name}</span>
@@ -858,7 +858,7 @@ window.openAdd = () => {
   document.getElementById('m-id').value='';
   ['m-name','m-spec'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('m-stock').value=0;
-  document.getElementById('m-min').value=5;
+  document.getElementById('m-min').value=0;
   document.getElementById('m-buy').value='0';
   document.getElementById('m-ondemand').checked=false;
   document.getElementById('m-photo').value='';
