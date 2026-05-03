@@ -673,7 +673,7 @@ const makeRow = p => {
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
       </div>
-      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${!p.ondemand&&avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}</div>
+      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${!p.ondemand&&avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}${p.photoURL?' 📷':''}</div>
     </div>
     <div id="feed-${p._id}" class="action-feed"></div>
     <div class="stock-ctrl">
