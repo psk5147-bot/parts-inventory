@@ -699,9 +699,12 @@ const renderQuick = () => {
     // 재고부족 우선
     const o={out:0,low:1,ok:2,ondemand:3};
     if(o[stOf(a)]!==o[stOf(b)]) return o[stOf(a)]-o[stOf(b)];
-    // 부품명 같으면 spec+name에서 숫자 추출해서 오름차순
+    // 부품명 기준으로 먼저 묶기
+    const nameComp = a.name.localeCompare(b.name,'ko');
+    if(nameComp!==0) return nameComp;
+    // 같은 부품명이면 spec 숫자 오름차순
     const getNum = p => {
-      const combined = p.name + ' ' + (p.spec||'');
+      const combined = (p.spec||'');
       const nums = combined.match(/\d+/g);
       return nums ? parseInt(nums[0]) : 0;
     };
@@ -709,11 +712,9 @@ const renderQuick = () => {
     const numB = getNum(b);
     if(numA!==numB) return numA-numB;
     // 신형 > 구형
-    const newA = (a.name+(a.spec||'')).includes('신형')?0:(a.name+(a.spec||'')).includes('구형')?1:2;
-    const newB = (b.name+(b.spec||'')).includes('신형')?0:(b.name+(b.spec||'')).includes('구형')?1:2;
-    if(newA!==newB) return newA-newB;
-    // 나머지 가나다순
-    return a.name.localeCompare(b.name,'ko');
+    const newA = (a.spec||'').includes('신형')?0:(a.spec||'').includes('구형')?1:2;
+    const newB = (b.spec||'').includes('신형')?0:(b.spec||'').includes('구형')?1:2;
+    return newA-newB;
   };
   const filter = p=>(!q||p.name.toLowerCase().includes(q))&&(!st||stOf(p)===st);
 
