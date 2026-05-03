@@ -648,7 +648,7 @@ const getDaysLeft = (stock, avgPerMonth) => {
 
 // 재고부족 알림 배너
 const renderAlertBanner = () => {
-  const urgent = parts.filter(p=>stOf(p)!=='ok');
+  const urgent = parts.filter(p=>stOf(p)!=='ok' && !p.ondemand);
   const banner = document.getElementById('alert-banner');
   if(!banner) return;
   if(!urgent.length){ banner.style.display='none'; return; }
