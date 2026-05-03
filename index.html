@@ -277,6 +277,18 @@ tr:hover td{background:#fafafa}
     <div class="fg"><label>매입가 (원)</label>
       <input type="text" id="m-buy" value="0" inputmode="numeric" oninput="fmtInput(this)" style="text-align:right">
     </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #eee;margin-top:4px">
+      <input type="checkbox" id="m-ondemand" style="width:16px;height:16px;cursor:pointer">
+      <label for="m-ondemand" style="font-size:13px;color:#555;cursor:pointer">주문형 부품 (재고 부족 표시 안 함)</label>
+    </div>
+    <div class="fg">
+      <label>부품 사진 (선택)</label>
+      <div id="photo-preview" style="display:none;margin-bottom:6px">
+        <img id="photo-img" style="width:100%;max-height:150px;object-fit:contain;border-radius:8px;border:1px solid #eee">
+        <button onclick="removePhoto()" style="font-size:11px;color:#c0392b;background:none;border:none;cursor:pointer;margin-top:4px">사진 삭제</button>
+      </div>
+      <input type="file" id="m-photo" accept="image/*" onchange="previewPhoto(this)" style="font-size:12px;padding:4px">
+    </div>
   </div>
   <div class="modal-ft">
     <button class="btn" onclick="closeModal()">취소</button>
@@ -309,6 +321,9 @@ import {
 import {
   getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getStorage, ref, uploadBytes, getDownloadURL, deleteObject
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB-wYELUMAs85APk_P4wRIpX216Tw50-2U",
@@ -320,11 +335,11 @@ const firebaseConfig = {
 };
 
 const fbApp = initializeApp(firebaseConfig);
-const db   = getFirestore(fbApp);
-const auth = getAuth(fbApp);
+const db      = getFirestore(fbApp);
+const auth    = getAuth(fbApp);
+const storage = getStorage(fbApp);
 const CATS = ['선반용','밀링용','기타'];
 
-// 사용자 이름 매핑
 const USER_NAMES = {
   'mohoro@naver.com':      '대표',
   'mixfactorydj@gmail.com':'과장',
@@ -341,8 +356,39 @@ let partsLoaded = false;
 const today     = () => new Date().toISOString().slice(0,10);
 const ymKey     = d  => d.slice(0,7);
 const thisMonth = () => ymKey(today());
-const stOf      = p  => p.stock===0?'out':p.stock<=p.min?'low':'ok';
-const badgeSt   = s  => s==='ok'?'<span class="badge b-ok">정상</span>':s==='low'?'<span class="badge b-low">부족</span>':'<span class="badge b-out">재고없음</span>';
+const stOf = p => {
+  if(p.ondemand) return 'ondemand';
+  return p.stock===0?'out':p.stock<=p.min?'low':'ok';
+};
+const badgeSt = s => {
+  if(s==='ondemand') return '<span class="badge" style="background:#F3E8FF;color:#6B21A8">주문형</span>';
+  if(s==='ok')  return '<span class="badge b-ok">정상</span>';
+  if(s==='low') return '<span class="badge b-low">부족</span>';
+  return '<span class="badge b-out">재고없음</span>';
+};
+
+// 사진 미리보기
+let currentPhotoFile = null;
+let currentPhotoURL = null;
+
+window.previewPhoto = el => {
+  const file = el.files[0]; if(!file) return;
+  currentPhotoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photo-img').src = e.target.result;
+    document.getElementById('photo-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+};
+
+window.removePhoto = () => {
+  currentPhotoFile = null;
+  currentPhotoURL = null;
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-img').src = '';
+  document.getElementById('m-photo').value = '';
+};
 
 window.fmtInput = el => {
   const raw = el.value.replace(/[^0-9]/g,'');
@@ -615,19 +661,19 @@ const makeRow = p => {
   const s = stOf(p);
   const isFav = favorites.includes(p._id);
   const avg = getAvgMonthly(p._id);
-  const days = getDaysLeft(p.stock, avg);
+  const days = p.ondemand ? null : getDaysLeft(p.stock, avg);
   let daysHtml='';
   if(days!==null){
     const cls=days<=7?'days-danger':days<=30?'days-warn':'days-ok';
     daysHtml=`<span class="days-left ${cls}">약 ${days}일치</span>`;
   }
-  return `<div class="prow ${s}">
+  return `<div class="prow ${s==='ondemand'?'':s}">
     <button class="fav-btn ${isFav?'on':'off'}" onclick="toggleFav('${p._id}')" title="즐겨찾기">⭐</button>
-    <div class="pinfo">
+    <div class="pinfo" onclick="showDetail('${p._id}')" style="cursor:pointer">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
       </div>
-      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}</div>
+      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${!p.ondemand&&avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}</div>
     </div>
     <div id="feed-${p._id}" class="action-feed"></div>
     <div class="stock-ctrl">
@@ -796,6 +842,10 @@ window.openAdd = () => {
   document.getElementById('m-stock').value=0;
   document.getElementById('m-min').value=5;
   document.getElementById('m-buy').value='0';
+  document.getElementById('m-ondemand').checked=false;
+  document.getElementById('m-photo').value='';
+  document.getElementById('photo-preview').style.display='none';
+  currentPhotoFile=null; currentPhotoURL=null;
   fillCatSelects();
   document.getElementById('modal-wrap').classList.add('open');
 };
@@ -809,12 +859,68 @@ window.openEdit = id => {
   document.getElementById('m-stock').value=p.stock;
   document.getElementById('m-min').value=p.min;
   document.getElementById('m-buy').value=p.buy.toLocaleString();
+  document.getElementById('m-ondemand').checked=p.ondemand||false;
+  document.getElementById('m-photo').value='';
+  currentPhotoFile=null;
+  currentPhotoURL=p.photoURL||null;
+  if(p.photoURL){
+    document.getElementById('photo-img').src=p.photoURL;
+    document.getElementById('photo-preview').style.display='block';
+  } else {
+    document.getElementById('photo-preview').style.display='none';
+  }
   fillCatSelects();
   document.getElementById('m-cat').value=p.cat;
   document.getElementById('modal-wrap').classList.add('open');
 };
 
-window.closeModal = () => document.getElementById('modal-wrap').classList.remove('open');
+window.closeModal = () => {
+  document.getElementById('modal-wrap').classList.remove('open');
+  currentPhotoFile=null; currentPhotoURL=null;
+};
+
+window.showDetail = id => {
+  const p = parts.find(x=>x._id===id); if(!p) return;
+  const s = stOf(p);
+  const avg = getAvgMonthly(p._id);
+  const days = p.ondemand ? null : getDaysLeft(p.stock, avg);
+  const ov = document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML=`
+    <div style="background:#fff;border-radius:16px;padding:24px;width:340px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:700">${p.name}</div>
+        <button onclick="this.closest('.fixed-ov').remove()" style="background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;line-height:1">×</button>
+      </div>
+      ${p.photoURL?`<img src="${p.photoURL}" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;border:1px solid #eee;margin-bottom:14px">` : ''}
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#888">상태</span>${badgeSt(s)}</div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#888">카테고리</span><span>${p.cat}</span></div>
+        ${p.spec?`<div style="display:flex;justify-content:space-between"><span style="color:#888">규격</span><span>${p.spec}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between"><span style="color:#888">현재 재고</span><span style="font-weight:700">${p.stock}개</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#888">최소 재고</span><span>${p.min}개</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#888">매입가</span><span>${p.buy.toLocaleString()}원</span></div>
+        ${avg>0&&!p.ondemand?`<div style="display:flex;justify-content:space-between"><span style="color:#888">월평균 판매</span><span>${avg.toFixed(1)}개</span></div>`:''}
+        ${days!==null?`<div style="display:flex;justify-content:space-between"><span style="color:#888">예상 소진</span><span>약 ${days}일</span></div>`:''}
+        ${p.ondemand?`<div style="color:#6B21A8;font-size:12px;background:#F3E8FF;padding:6px 10px;border-radius:6px">주문형 부품 — 재고 관리 제외</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="this.closest('.fixed-ov').remove();openEdit('${p._id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:13px;cursor:pointer;font-weight:500">수정</button>
+        <button onclick="this.closest('.fixed-ov').remove()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#111;color:#fff;font-size:13px;cursor:pointer;font-weight:500">닫기</button>
+      </div>
+    </div>`;
+  ov.classList.add('fixed-ov');
+  ov.onclick = e => { if(e.target===ov) ov.remove(); };
+  document.body.appendChild(ov);
+};
+
+window.showPhoto = url => {
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  ov.innerHTML=`<img src="${url}" style="max-width:90vw;max-height:90vh;border-radius:8px">`;
+  ov.onclick=()=>ov.remove();
+  document.body.appendChild(ov);
+};
 
 window.savePart = async () => {
   const btn=document.getElementById('save-btn');
@@ -827,10 +933,21 @@ window.savePart = async () => {
     stock:parseInt(document.getElementById('m-stock').value)||0,
     min:  parseInt(document.getElementById('m-min').value)||0,
     buy:  parseFmt(document.getElementById('m-buy').value),
+    ondemand: document.getElementById('m-ondemand').checked,
     sell: 0, updatedAt: serverTimestamp()
   };
   if(!d.name){alert('부품명을 입력하세요');btn.disabled=false;btn.textContent='저장';return;}
   try{
+    // 사진 업로드
+    if(currentPhotoFile){
+      const storageRef = ref(storage, `parts/${Date.now()}_${currentPhotoFile.name}`);
+      await uploadBytes(storageRef, currentPhotoFile);
+      d.photoURL = await getDownloadURL(storageRef);
+    } else if(currentPhotoURL){
+      d.photoURL = currentPhotoURL;
+    } else {
+      d.photoURL = null;
+    }
     if(id){ await updateDoc(doc(db,'parts',id),d); showToast('수정 완료!'); }
     else { d.createdAt=serverTimestamp(); await addDoc(collection(db,'parts'),d); showToast('부품 추가 완료!'); }
     closeModal();
