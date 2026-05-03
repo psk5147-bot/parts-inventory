@@ -466,7 +466,7 @@ const notifiedIds = new Set();
 const checkAndNotify = () => {
   if(Notification.permission !== 'granted') return;
   parts.forEach(p => {
-    if(stOf(p) !== 'ok' && !notifiedIds.has(p._id)){
+    if(stOf(p) !== 'ok' && !p.ondemand && !notifiedIds.has(p._id)){
       notifiedIds.add(p._id);
       new Notification('⚠ 재고 부족 알림', { body:`${p.name} 재고가 ${p.stock}개 남았어요!` });
     }
