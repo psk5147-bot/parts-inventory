@@ -553,7 +553,7 @@ window.sell = (id, qty) => {
       showFeed(id,'sale',qty);
       await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
       await addDoc(collection(db,'history'),{
-        type:'sale', date:today(), pid:id, pname:p.name, qty, price:p.buy,
+        type:'sale', date:today(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
         user: userName
       });
     }
@@ -571,7 +571,7 @@ window.restock = (id, qty) => {
       showFeed(id,'restock',qty);
       await updateDoc(doc(db,'parts',id),{stock:p.stock+qty});
       await addDoc(collection(db,'history'),{
-        type:'in', date:today(), pid:id, pname:p.name, qty, price:p.buy,
+        type:'in', date:today(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
         user: userName
       });
     }
@@ -585,7 +585,7 @@ window.setStock = async (id, val) => {
   const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
   await updateDoc(doc(db,'parts',id),{stock:v});
   await addDoc(collection(db,'history'),{
-    type:diff<0?'sale':'in', date:today(), pid:id, pname:p.name,
+    type:diff<0?'sale':'in', date:today(), pid:id, pname:p.name, pspec:p.spec||'',
     qty:Math.abs(diff), price:p.buy, user:userName
   });
 };
@@ -763,7 +763,7 @@ const renderHist = () => {
       <div style="display:flex;align-items:center;gap:8px">
         <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}">${h.type==='sale'?'판매':'입고'}</span>
         <div>
-          <div>${h.pname} <span style="font-size:11px;color:#aaa;margin-left:4px">${h.user||''}</span></div>
+          <div>${h.pname}${h.pspec?` <span style="font-size:11px;color:#888">(${h.pspec})</span>`:''} <span style="font-size:11px;color:#aaa;margin-left:4px">${h.user||''}</span></div>
           <div style="font-size:11px;color:#aaa">${h.date}</div>
         </div>
       </div>
