@@ -549,9 +549,9 @@ window.sell = (id, qty) => {
     `${p.name} ${qty}개를 판매 처리할까요?\n\n처리자: ${userName}`,
     '판매',
     async () => {
-      if(p.stock < qty){ showToast('재고 부족!'); return; }
+      if(!p.ondemand && p.stock < qty){ showToast('재고 부족!'); return; }
       showFeed(id,'sale',qty);
-      await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
+      if(!p.ondemand) await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
       await addDoc(collection(db,'history'),{
         type:'sale', date:today(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
         user: userName
