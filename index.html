@@ -818,7 +818,12 @@ const renderDash = () => {
     <div class="mcard"><div class="mcard-l">전체 부품</div><div class="mcard-v">${parts.length}종</div></div>
     <div class="mcard"><div class="mcard-l">재고 주의</div><div class="mcard-v" style="color:#c0392b">${low}종</div></div>
     <div class="mcard"><div class="mcard-l">${label} 판매 종류</div><div class="mcard-v">${[...new Set(ms.map(h=>h.pid))].length}종</div></div>`;
-  const map={};ms.forEach(h=>{map[h.pid]={n:h.pname,q:(map[h.pid]?.q||0)+h.qty};});
+  const map={};ms.forEach(h=>{
+    const key=h.pid+(h.pspec||'');
+    const label2=h.pname+(h.pspec?` (${h.pspec})`:'');
+    if(!map[key]) map[key]={n:label2,q:0};
+    map[key].q+=h.qty;
+  });
   const top=Object.values(map).sort((a,b)=>b.q-a.q).slice(0,6);const mx=top[0]?.q||1;
   document.getElementById('d-top').innerHTML=top.length?top.map((x,i)=>`
     <div class="rank-row"><div style="display:flex;align-items:center;gap:6px">
@@ -826,7 +831,7 @@ const renderDash = () => {
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.n}</span>
       <span style="color:#888;font-size:12px">${x.q}개</span></div>
       <div class="bar-o" style="margin-left:20px"><div class="bar-i" style="width:${Math.round(x.q/mx*100)}%;background:#1565C0"></div></div>
-    </div>`).join(''):'<div class="empty">이번달 판매 없음</div>';
+    </div>`).join(''):'<div class="empty">판매 없음</div>';
   const low2=parts.filter(p=>stOf(p)!=='ok'&&!p.ondemand).sort((a,b)=>a.stock-b.stock);
   document.getElementById('d-low').innerHTML=low2.length?low2.map(p=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:13px">
@@ -834,7 +839,10 @@ const renderDash = () => {
       <span style="margin-left:8px">${badgeSt(stOf(p))}</span></div>`).join(''):'<div class="empty">재고 부족 없음</div>';
 
   // 이번달 부품별 판매량
-  const map2={};ms.forEach(h=>{map2[h.pname]=(map2[h.pname]||0)+h.qty;});
+  const map2={};ms.forEach(h=>{
+    const key2=h.pname+(h.pspec?` (${h.pspec})`:'');
+    map2[key2]=(map2[key2]||0)+h.qty;
+  });
   const labs=Object.keys(map2),vals=Object.values(map2);
   const ctx1=document.getElementById('d-chart-month');
   if(chartMonth)chartMonth.destroy();
@@ -870,8 +878,9 @@ const renderDash = () => {
   const yearSales=allSales.filter(h=>h.date.startsWith(curYear));
   const annualMap={};
   yearSales.forEach(h=>{
-    const key=h.pid;
-    if(!annualMap[key]) annualMap[key]={name:h.pname,spec:h.pspec||'',qty:0,isOndemand:parts.find(p=>p._id===key)?.ondemand||false};
+    const key=h.pid+(h.pspec||'');
+    const label3=h.pname+(h.pspec?` (${h.pspec})`:'');
+    if(!annualMap[key]) annualMap[key]={name:label3,qty:0,isOndemand:parts.find(p=>p._id===h.pid)?.ondemand||false};
     annualMap[key].qty+=h.qty;
   });
   const annualArr=Object.values(annualMap).sort((a,b)=>b.qty-a.qty);
@@ -880,7 +889,7 @@ const renderDash = () => {
     <div style="padding:7px 0;border-bottom:1px solid #eee">
       <div style="display:flex;align-items:center;gap:6px">
         <span style="font-size:11px;color:#aaa;min-width:18px">${i+1}</span>
-        <span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.name}${x.spec?` <span style="font-size:11px;color:#888">(${x.spec})</span>`:''}</span>
+        <span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.name}</span>
         ${x.isOndemand?'<span style="font-size:10px;background:#F3E8FF;color:#6B21A8;padding:1px 6px;border-radius:3px">주문형</span>':''}
         <span style="font-size:13px;font-weight:600;margin-left:8px">${x.qty}개</span>
       </div>
