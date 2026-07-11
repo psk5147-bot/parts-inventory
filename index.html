@@ -520,7 +520,12 @@ async function startListeners(){
   unsubHist = onSnapshot(
     query(collection(db,'history'), orderBy('date','desc')),
     snap => {
-      hist = snap.docs.map(d=>({...d.data(), _id: d.id}));
+      hist = snap.docs.map(d=>({...d.data(), _id: d.id}))
+        .sort((a,b)=>{
+          if(a.date!==b.date) return a.date<b.date?1:-1;
+          const ta=a.ts?.seconds||0, tb=b.ts?.seconds||0;
+          return tb-ta;
+        });
       const activeTab = document.querySelector('.tab.on')?.textContent?.trim();
       if(activeTab==='거래 내역') renderHist();
       if(activeTab==='통계') renderDash();
@@ -571,7 +576,7 @@ window.sell = (id, qty) => {
       showFeed(id,'sale',qty);
       if(!p.ondemand) await updateDoc(doc(db,'parts',id),{stock:p.stock-qty});
       await addDoc(collection(db,'history'),{
-        type:'sale', date:today(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
+        type:'sale', date:today(), ts:serverTimestamp(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
         user: userName
       });
     }
@@ -589,7 +594,7 @@ window.restock = (id, qty) => {
       showFeed(id,'restock',qty);
       await updateDoc(doc(db,'parts',id),{stock:p.stock+qty});
       await addDoc(collection(db,'history'),{
-        type:'in', date:today(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
+        type:'in', date:today(), ts:serverTimestamp(), pid:id, pname:p.name, pspec:p.spec||'', qty, price:p.buy,
         user: userName
       });
     }
@@ -603,7 +608,7 @@ window.setStock = async (id, val) => {
   const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
   await updateDoc(doc(db,'parts',id),{stock:v});
   await addDoc(collection(db,'history'),{
-    type:diff<0?'sale':'in', date:today(), pid:id, pname:p.name, pspec:p.spec||'',
+    type:diff<0?'sale':'in', date:today(), ts:serverTimestamp(), pid:id, pname:p.name, pspec:p.spec||'',
     qty:Math.abs(diff), price:p.buy, user:userName
   });
 };
@@ -708,15 +713,12 @@ const makeRow = p => {
 const renderQuick = () => {
   const q  = (document.getElementById('q-search')?.value||'').toLowerCase();
   const st = document.getElementById('q-st')?.value||'';
-  // 즐겨찾기 → 재고부족 → 가나다 순
+  // 즐겨찾기 → 가나다 순 (고정, 재고 변동에 영향받지 않음)
   const sortFn = (a,b)=>{
     // 즐겨찾기 우선
     const fa=favorites.includes(a._id)?0:1;
     const fb=favorites.includes(b._id)?0:1;
     if(fa!==fb) return fa-fb;
-    // 재고부족 우선
-    const o={out:0,low:1,ok:2,ondemand:3};
-    if(o[stOf(a)]!==o[stOf(b)]) return o[stOf(a)]-o[stOf(b)];
     // 부품명 기준으로 먼저 묶기
     const nameComp = a.name.localeCompare(b.name,'ko');
     if(nameComp!==0) return nameComp;
