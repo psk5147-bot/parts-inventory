@@ -169,23 +169,8 @@ tr:hover td{background:#fafafa}
 </head>
 <body>
 
-<!-- 로그인 화면 -->
-<div id="login-screen">
-  <div class="login-wrap">
-    <h2>🔧 재고 관리</h2>
-    <div class="login-sub">화천이티씨</div>
-    <div class="login-form">
-      <input type="email" id="login-email" placeholder="이메일" autocomplete="email">
-      <input type="password" id="login-pw" placeholder="비밀번호" autocomplete="current-password"
-        onkeydown="if(event.key==='Enter')doLogin()">
-      <div class="login-err" id="login-err"></div>
-      <button class="btn btn-p" onclick="doLogin()" id="login-btn">로그인</button>
-    </div>
-  </div>
-</div>
-
 <!-- 메인 앱 -->
-<div id="main-app" style="display:none">
+<div id="main-app">
 <div class="app">
 
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
@@ -193,8 +178,7 @@ tr:hover td{background:#fafafa}
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
     <button class="notif-btn" id="notif-btn" onclick="requestNotif()">🔔 알림 허용</button>
     <div class="user-badge">
-      <span id="user-name-badge">-</span>
-      <span id="logout-link" style="cursor:pointer;color:#888;display:none" onclick="doLogout()">로그아웃</span>
+      <span id="user-name-badge">대표</span>
     </div>
     <div class="sync-badge" id="sync-status">
       <div class="spinner" style="width:12px;height:12px;border-width:1.5px"></div> 연결 중...
@@ -360,7 +344,7 @@ import {
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence
+  getAuth, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -450,43 +434,11 @@ const setSyncStatus = ok => {
     : '<span style="color:#c0392b">⚠ 연결 오류</span>';
 };
 
-// ── 로그인 ──
-await setPersistence(auth, browserLocalPersistence);
-
-window.doLogin = async () => {
-  const email = document.getElementById('login-email').value.trim();
-  const pw    = document.getElementById('login-pw').value;
-  const btn   = document.getElementById('login-btn');
-  const err   = document.getElementById('login-err');
-  err.textContent=''; btn.disabled=true; btn.textContent='로그인 중...';
-  try {
-    await signInWithEmailAndPassword(auth, email, pw);
-  } catch(e) {
-    err.textContent='이메일 또는 비밀번호가 틀렸어요.';
-    btn.disabled=false; btn.textContent='로그인';
-  }
-};
-
-window.doLogout = async () => {
-  await signOut(auth);
-};
-
-let _entered=false;
-const enterApp=()=>{
-  if(_entered) return; _entered=true;
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-app').style.display='block';
-  startListeners();
-  updateNotifBtn();
-};
-// 로그인 없이 바로 사용한다 (예전에 로그인한 기기는 로그인 이름을 그대로 쓴다)
-setTimeout(()=>{ document.getElementById('user-name-badge').textContent=currentUser?(USER_NAMES[currentUser.email]||currentUser.email):'대표'; enterApp(); },0);
+// 로그인 불필요. 기존 기기의 처리자 이름만 읽으며 앱 시작을 기다리게 하지 않는다.
 onAuthStateChanged(auth, user => {
-  currentUser = user||null;
-  document.getElementById('user-name-badge').textContent = user ? (USER_NAMES[user.email]||user.email) : '대표';
-  const lo=document.getElementById('logout-link'); if(lo) lo.style.display = user ? '' : 'none';
-  enterApp();
-});
+  currentUser = user || null;
+  document.getElementById('user-name-badge').textContent = user ? (USER_NAMES[user.email] || user.email) : '대표';
+}, error => console.warn('처리자 정보 확인 생략:',error.code));
 
 // ── 푸시 알림 ──
 const notifOn = () => Notification.permission==='granted' && localStorage.getItem('notifOff')!=='1';
@@ -1109,6 +1061,10 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); co
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(e=>console.log(e));
 }
+
+// 로그인 상태·인증 저장소와 관계없이 재고 데이터를 즉시 불러온다.
+startListeners();
+updateNotifBtn();
 
 // 모바일 첫 로드 대비 강제 렌더링
 setTimeout(()=>renderQuick(), 1000);
