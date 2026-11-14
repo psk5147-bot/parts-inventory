@@ -1,6 +1,6 @@
 {
-  "name": "부품 재고 관리",
-  "short_name": "부품재고",
+  "name": "재고 관리",
+  "short_name": "재고 관리",
   "description": "화천이티씨 부품 재고 관리",
   "start_url": "/parts-inventory/",
   "display": "standalone",
