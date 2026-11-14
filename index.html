@@ -194,7 +194,7 @@ tr:hover td{background:#fafafa}
     <button class="notif-btn" id="notif-btn" onclick="requestNotif()">🔔 알림 허용</button>
     <div class="user-badge">
       <span id="user-name-badge">-</span>
-      <span style="cursor:pointer;color:#888" onclick="doLogout()">로그아웃</span>
+      <span id="logout-link" style="cursor:pointer;color:#888;display:none" onclick="doLogout()">로그아웃</span>
     </div>
     <div class="sync-badge" id="sync-status">
       <div class="spinner" style="width:12px;height:12px;border-width:1.5px"></div> 연결 중...
@@ -471,22 +471,21 @@ window.doLogout = async () => {
   await signOut(auth);
 };
 
+let _entered=false;
+const enterApp=()=>{
+  if(_entered) return; _entered=true;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  startListeners();
+  updateNotifBtn();
+};
+// 로그인 없이 바로 사용한다 (예전에 로그인한 기기는 로그인 이름을 그대로 쓴다)
+setTimeout(()=>{ document.getElementById('user-name-badge').textContent=currentUser?(USER_NAMES[currentUser.email]||currentUser.email):'대표'; enterApp(); },0);
 onAuthStateChanged(auth, user => {
-  if(user){
-    currentUser = user;
-    const name = USER_NAMES[user.email] || user.email;
-    document.getElementById('user-name-badge').textContent = name;
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('main-app').style.display='block';
-    startListeners();
-    if(Notification.permission==='granted'){
-    }
-    updateNotifBtn();
-  } else {
-    currentUser=null;
-    document.getElementById('login-screen').style.display='block';
-    document.getElementById('main-app').style.display='none';
-  }
+  currentUser = user||null;
+  document.getElementById('user-name-badge').textContent = user ? (USER_NAMES[user.email]||user.email) : '대표';
+  const lo=document.getElementById('logout-link'); if(lo) lo.style.display = user ? '' : 'none';
+  enterApp();
 });
 
 // ── 푸시 알림 ──
@@ -601,7 +600,7 @@ const showFeed = (id, type, qty) => {
 // ── 판매 / 입고 ──
 window.sell = (id, qty) => {
   const p = parts.find(x=>x._id===id); if(!p) return;
-  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '대표';
   showConfirm(
     '판매 확인',
     `${p.name} ${qty}개를 판매 처리할까요?\n\n처리자: ${userName}`,
@@ -620,7 +619,7 @@ window.sell = (id, qty) => {
 
 window.restock = (id, qty) => {
   const p = parts.find(x=>x._id===id); if(!p) return;
-  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '대표';
   showConfirm(
     '입고 확인',
     `${p.name} ${qty}개를 입고 처리할까요?\n\n처리자: ${userName}`,
@@ -640,7 +639,7 @@ window.setStock = async (id, val) => {
   const p=parts.find(x=>x._id===id); if(!p) return;
   const v=Math.max(0,parseInt(val)||0);
   const diff=v-p.stock; if(diff===0) return;
-  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '알수없음';
+  const userName = USER_NAMES[currentUser?.email] || currentUser?.email || '대표';
   await updateDoc(doc(db,'parts',id),{stock:v});
   await addDoc(collection(db,'history'),{
     type:diff<0?'sale':'in', date:today(), ts:serverTimestamp(), pid:id, pname:p.name, pspec:p.spec||'',
