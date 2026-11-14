@@ -133,9 +133,33 @@ tr:hover td{background:#fafafa}
 .fav-btn{font-size:14px;cursor:pointer;padding:2px 4px;background:none;border:none;flex-shrink:0;transition:all .15s;line-height:1}
 .fav-btn.on{filter:none}
 .fav-btn.off{filter:grayscale(100%) brightness(1.8);opacity:.4}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.chip{flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px solid #ddd;background:#fff;font-size:13px;color:#555;cursor:pointer}
+.chip.on{background:#111;color:#fff;border-color:#111}
+.qchips{display:none}
+.inv-cards{display:none}
+.icard{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:center}
+.icard .nm{font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.icard .sp{font-size:12px;color:#778;margin-top:2px}
+.icard .big{font-size:24px;font-weight:700;line-height:1;text-align:center}
+.icard .big small{display:block;font-size:10px;color:#99a;font-weight:400;margin-top:4px}
+.dayhd{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#556;background:#f4f6f8;padding:7px 10px;border-radius:7px;margin:12px 0 2px}
+.dayhd:first-child{margin-top:0}
 @media(max-width:700px){
+  .qchips{display:flex}
+  .tbl-wrap.inv-tbl{display:none}
+  .inv-cards{display:block}
+  .col-box{overflow:visible;display:block}
+  .col-body{flex:none}
+  .col-body{max-height:none;overflow:visible}
+  .pbuy{display:none}
+  .action-feed{min-width:0;padding:3px 4px;font-size:10px}
+  .prow{gap:6px;padding:10px 8px}
+  .edit-sm{padding:4px 2px}
+  .scval{width:40px;font-size:17px}
+  .scbtn{width:36px;height:36px;font-size:19px}
+  .hist-row{gap:8px}
   .quick-cols{grid-template-columns:1fr;height:auto}
-  .col-body{max-height:300px}
   .cards{grid-template-columns:1fr 1fr}
   .dash-grid{grid-template-columns:1fr}
   .edit-sm{display:inline-block}
@@ -195,6 +219,7 @@ tr:hover td{background:#fafafa}
     </select>
     <button class="btn btn-p" onclick="openAdd()" style="margin-left:auto">+ 부품 추가</button>
   </div>
+  <div class="chips qchips" id="q-chips"></div>
   <div class="quick-cols">
     <div class="col-box">
       <div class="col-hd" style="color:#6B21A8">🔵 선반용 <span id="lathe-count" style="color:#aaa;font-weight:400;margin-left:4px"></span></div>
@@ -217,11 +242,14 @@ tr:hover td{background:#fafafa}
     <input type="text" id="i-search" placeholder="부품명·규격 검색..." style="width:160px" oninput="renderInv()">
     <select id="i-cat" onchange="renderInv()"><option value="">전체 카테고리</option></select>
     <select id="i-st" onchange="renderInv()">
-      <option value="">전체 상태</option><option value="ok">정상</option><option value="low">부족</option><option value="out">재고없음</option>
+      <option value="">전체 상태</option><option value="ok">정상</option><option value="low">부족</option><option value="out">재고없음</option><option value="ondemand">주문형</option>
     </select>
+    <select id="i-sort" onchange="renderInv()"><option value="">이름순</option><option value="stock">재고 적은순</option></select>
     <button class="btn btn-p" onclick="openAdd()" style="margin-left:auto">+ 부품 추가</button>
   </div>
-  <div class="tbl-wrap">
+  <div class="chips" id="i-chips"></div>
+  <div class="inv-cards" id="inv-cards"></div>
+  <div class="tbl-wrap inv-tbl">
     <table>
       <thead><tr>
         <th>부품명</th><th>카테고리</th>
@@ -240,7 +268,6 @@ tr:hover td{background:#fafafa}
     <select id="h-type" onchange="renderHist()"><option value="">전체</option><option value="sale">판매</option><option value="in">입고</option></select>
     <select id="h-mon" onchange="renderHist()"><option value="">전체 기간</option></select>
     <select id="h-part" onchange="renderHist()"><option value="">전체 부품</option></select>
-    <button class="btn btn-d" style="margin-left:auto;font-size:12px" onclick="deleteAllHist()">🗑 전체 내역 삭제</button>
   </div>
   <div class="card"><div id="hist-list"><div class="empty">불러오는 중...</div></div></div>
 </div>
@@ -282,7 +309,7 @@ tr:hover td{background:#fafafa}
     <input type="hidden" id="m-id">
     <div class="fg"><label>부품명</label><input id="m-name" placeholder="예: 6205 볼베어링"></div>
     <div class="fg"><label>카테고리</label><select id="m-cat"></select></div>
-    <div class="fg"><label>규격·메모 (선택)</label><input id="m-spec" placeholder="예: 25×52×15mm"></div>
+    <div class="fg"><label>규격·메모 (선택)</label><input id="m-spec" placeholder="예: HL460용 신형 / 25×52×15mm"></div>
     <div class="g2">
       <div class="fg"><label>현재 재고 (개)</label><input type="number" id="m-stock" value="0" min="0"></div>
       <div class="fg"><label>최소 재고 (경고 기준)</label><input type="number" id="m-min" value="5" min="0"></div>
@@ -621,7 +648,7 @@ window.setStock = async (id, val) => {
 };
 
 // ── 전체 내역 삭제 ──
-window.deleteAllHist = () => {
+window.deleteAllHist_disabled = () => {
   showConfirm(
     '전체 내역 삭제',
     '모든 거래 내역을 삭제할까요?\n통계도 초기화돼요. 되돌릴 수 없어요.',
@@ -684,7 +711,7 @@ const renderAlertBanner = () => {
   if(!urgent.length){ banner.style.display='none'; return; }
   banner.style.display='flex';
   banner.innerHTML=`<span>⚠️</span><strong>주문 필요 ${urgent.length}종</strong><span style="color:#888;font-size:12px">→</span>`
-    +urgent.map(p=>`<span style="background:#fff;border:1px solid #FFCDD2;border-radius:6px;padding:2px 8px;font-size:12px">${p.name}${p.spec?' '+p.spec:''} (${p.stock}개)</span>`).join('');
+    +urgent.map(p=>`<span onclick="jumpPart('${p._id}')" style="cursor:pointer;background:#fff;border:1px solid #FFCDD2;border-radius:6px;padding:4px 10px;font-size:12px">${p.name}${p.spec?' '+p.spec:''} (${p.stock}개)</span>`).join('');
 };
 
 const makeRow = p => {
@@ -703,7 +730,7 @@ const makeRow = p => {
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="pname">${p.name}</span>${badgeSt(s)}${daysHtml}
       </div>
-      <div class="pmeta">${p.spec?p.spec+' · ':''}매입 ${p.buy.toLocaleString()}원${!p.ondemand&&avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}${p.photoURL?' 📷':''}</div>
+      <div class="pmeta">${p.spec?p.spec:''}<span class="pbuy">${p.spec?' · ':''}매입 ${p.buy.toLocaleString()}원</span>${!p.ondemand&&avg>0?` · 월평균 ${avg.toFixed(1)}개`:''}${p.photoURL?' 📷':''}</div>
     </div>
     <div id="feed-${p._id}" class="action-feed"></div>
     <div class="stock-ctrl">
@@ -717,6 +744,9 @@ const makeRow = p => {
   </div>`;
 };
 
+let quickCat='선반용';
+window.setQuickCat = c => { quickCat=c; renderQuick(); };
+window.jumpPart = id => { const p=parts.find(x=>x._id===id); if(!p) return; document.getElementById('q-search').value=p.name; renderQuick(); window.scrollTo({top:0,behavior:'smooth'}); };
 const renderQuick = () => {
   const q  = (document.getElementById('q-search')?.value||'').toLowerCase();
   const st = document.getElementById('q-st')?.value||'';
@@ -745,6 +775,11 @@ const renderQuick = () => {
   };
   const filter = p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!st||stOf(p)===st);
 
+  const mobile = window.matchMedia('(max-width:700px)').matches;
+  const showAll = !mobile || !!q;
+  const qcnt = c=>parts.filter(p=>p.cat===c&&filter(p)).length;
+  document.getElementById('q-chips').innerHTML = CATS.map(c=>`<button class="chip ${(showAll?'':quickCat)===c?'on':''}" onclick="setQuickCat('${c}')">${c} ${qcnt(c)}</button>`).join('');
+  [['선반용','col-lathe'],['밀링용','col-mill'],['기타','col-other']].forEach(([c,id])=>{ const b=document.getElementById(id).closest('.col-box'); b.style.display=(showAll||quickCat===c)?'':'none'; });
   const lathe = parts.filter(p=>p.cat==='선반용'&&filter(p)).sort(sortFn);
   const mill  = parts.filter(p=>p.cat==='밀링용'&&filter(p)).sort(sortFn);
   const other = parts.filter(p=>p.cat==='기타'&&filter(p)).sort(sortFn);
@@ -763,7 +798,19 @@ const renderInv = () => {
   const q  =(document.getElementById('i-search')?.value||'').toLowerCase();
   const cat= document.getElementById('i-cat')?.value||'';
   const st = document.getElementById('i-st')?.value||'';
-  const list=parts.filter(p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st));
+  const sort = document.getElementById('i-sort')?.value||'';
+  let list=parts.filter(p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st));
+  if(sort==='stock') list=[...list].sort((a,b)=>(a.ondemand?1e9:a.stock)-(b.ondemand?1e9:b.stock));
+  const cnt=k=>parts.filter(p=>(!k||stOf(p)===k)).length;
+  document.getElementById('i-chips').innerHTML=[['','전체'],['low','부족'],['out','재고없음'],['ok','정상'],['ondemand','주문형']].map(([k,l])=>`<button class="chip ${st===k?'on':''}" onclick="document.getElementById('i-st').value='${k}';renderInv()">${l} ${cnt(k)}</button>`).join('');
+  document.getElementById('inv-cards').innerHTML=list.length?list.map(p=>`
+    <div class="icard">
+      <div style="flex:1;min-width:0"><div class="nm">${esc(p.name)}</div><div class="sp">${p.spec?esc(p.spec)+' · ':''}${p.cat} · 매입 ${p.buy.toLocaleString()}원</div>
+        <div style="margin-top:6px">${badgeSt(stOf(p))}</div></div>
+      <div class="big">${p.ondemand?'-':p.stock}<small>${p.ondemand?'주문형':'최소 '+p.min}</small></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><button class="btn" style="padding:6px 12px;font-size:12px" onclick="openEdit('${p._id}')">수정</button>
+      <button class="btn btn-d" style="padding:6px 12px;font-size:12px" onclick="delPart('${p._id}')">삭제</button></div>
+    </div>`).join(''):'<div class="empty">해당 부품 없음</div>';
   document.getElementById('inv-body').innerHTML=list.length?list.map(p=>`
     <tr>
       <td>${p.name}<br><span style="font-size:11px;color:#888">${p.spec||''}</span></td>
@@ -780,25 +827,33 @@ const renderInv = () => {
 };
 window.renderInv = renderInv;
 
+let histLimit=30, histSig='';
+window.addEventListener('resize',()=>{});
 const renderHist = () => {
   const ht=document.getElementById('h-type').value;
   const hm=document.getElementById('h-mon').value;
   const hp=document.getElementById('h-part').value;
   const list=hist.filter(h=>(!ht||h.type===ht)&&(!hm||ymKey(h.date)===hm)&&(!hp||h.pid===hp));
-  document.getElementById('hist-list').innerHTML=list.length?list.map(h=>`
+  const sig=ht+'|'+hm+'|'+hp; if(sig!==histSig){histSig=sig;histLimit=30;}
+  const shown=list.slice(0,histLimit);
+  const byDay={}; shown.forEach(h=>{(byDay[h.date]=byDay[h.date]||[]).push(h);});
+  const wd=['일','월','화','수','목','금','토'];
+  document.getElementById('hist-list').innerHTML=shown.length?Object.keys(byDay).map(day=>{
+    const rows=byDay[day]; const sq=rows.filter(h=>h.type==='sale').reduce((s,h)=>s+h.qty,0), iq=rows.filter(h=>h.type!=='sale').reduce((s,h)=>s+h.qty,0);
+    const dt=new Date(day+'T00:00:00');
+    return `<div class="dayhd"><span>${dt.getMonth()+1}월 ${dt.getDate()}일 (${wd[dt.getDay()]})</span><span>${sq?'판매 '+sq+'개':''}${sq&&iq?' · ':''}${iq?'입고 '+iq+'개':''}</span></div>`+rows.map(h=>`
     <div class="hist-row">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}">${h.type==='sale'?'판매':'입고'}</span>
-        <div>
-          <div>${h.pname}${h.pspec?` <span style="font-size:11px;color:#888">(${h.pspec})</span>`:''} <span style="font-size:11px;color:#aaa;margin-left:4px">${h.user||''}</span></div>
-          <div style="font-size:11px;color:#aaa">${h.date}</div>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+        <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}" style="flex-shrink:0;white-space:nowrap">${h.type==='sale'?'판매':'입고'}</span>
+        <div style="min-width:0">
+          <div style="overflow-wrap:anywhere">${esc(shortName(h.pname))}${h.pspec?` <span style="font-size:11px;color:#888">(${esc(shortName(h.pspec))})</span>`:''} <span style="font-size:11px;color:#aaa;margin-left:4px">${esc(h.user||'')}</span></div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="font-weight:600">${h.type==='sale'?'−':'+'}${h.qty}개</div>
-        <button onclick="deleteHist('${h._id}')" style="font-size:11px;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px" onmouseover="this.style.color='#c0392b'" onmouseout="this.style.color='#aaa'">삭제</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="font-weight:600;white-space:nowrap">${h.type==='sale'?'−':'+'}${h.qty}개</div>
+        <button onclick="deleteHist('${h._id}')" style="font-size:11px;color:#aaa;background:none;border:none;cursor:pointer;padding:6px;white-space:nowrap">삭제</button>
       </div>
-    </div>`).join(''):'<div class="empty">내역 없음</div>';
+    </div>`).join('');}).join('')+(list.length>histLimit?`<button class="btn" style="width:100%;margin-top:12px;padding:12px" onclick="histLimit+=30;renderHist()">더 보기 (${list.length-histLimit}건 남음)</button>`:''):'<div class="empty">내역 없음</div>';
   const months=[...new Set(hist.map(h=>ymKey(h.date)))].sort().reverse();
   const msel=document.getElementById('h-mon');const cv=msel.value;
   msel.innerHTML='<option value="">전체 기간</option>'+months.map(m=>`<option value="${m}"${m===cv?' selected':''}>${m}</option>`).join('');
@@ -806,9 +861,10 @@ const renderHist = () => {
   psel.innerHTML='<option value="">전체 부품</option>'+parts.map(p=>`<option value="${p._id}"${p._id===pv?' selected':''}>${p.name}</option>`).join('');
 };
 window.renderHist = renderHist;
+Object.defineProperty(window,"histLimit",{get:()=>histLimit,set:v=>{histLimit=v;}});
 
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const shortName = s => String(s).replace(/\s*\(공장 직송[^)]*(\([^)]*\)[^)]*)*\)/,'').trim();
+const shortName = s => String(s).startsWith('공장 직송')?'공장 직송':String(s).replace(/\s*\(공장 직송[^)]*(\([^)]*\)[^)]*)*\)/,'').trim();
 const renderDash = () => {
   const allSales = hist.filter(h=>h.type==='sale');
   const monSel=document.getElementById('dash-mon');
@@ -994,8 +1050,14 @@ window.showPhoto = url => {
   document.body.appendChild(ov);
 };
 
-window.savePart = async () => {
+window.savePart = async (force) => {
   const btn=document.getElementById('save-btn');
+  if(force!==true && !document.getElementById('m-id').value){
+    const nm=document.getElementById('m-name').value.trim().toLowerCase(), sp=document.getElementById('m-spec').value.trim().toLowerCase();
+    if(nm && parts.some(p=>p.name.trim().toLowerCase()===nm && (p.spec||'').trim().toLowerCase()===sp)){
+      showConfirm('이미 있는 부품','이름과 규격이 같은 부품이 이미 있어요.\n그래도 새로 추가할까요?','그래도 추가',()=>savePart(true)); return;
+    }
+  }
   btn.disabled=true; btn.textContent='저장 중...';
   const id=document.getElementById('m-id').value;
   const d={
