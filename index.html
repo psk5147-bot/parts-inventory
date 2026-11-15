@@ -465,6 +465,10 @@ body>div[style*="rgba(0,0,0,.85)" i] img{border-radius:16px!important}
   .notif-btn{padding:0 10px}
   .user-badge{padding:0 10px}
 }
+/* 확인 팝업: 삭제는 빨간 버튼 / 통계 탭 중복 제목 정리 (2026-11-16) */
+#confirm-ok-btn.danger,#confirm-ok-btn.danger:hover{background:#d64545;border-color:#d64545;color:#fff}
+#panel-dash .st-top>div:first-child,.st-top>div:first-child{display:none}
+.st-top{justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -805,6 +809,7 @@ function showConfirm(title, msg, okLabel, cb){
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-msg').textContent   = msg;
   document.getElementById('confirm-ok-btn').textContent= okLabel||'확인';
+  document.getElementById('confirm-ok-btn').classList.toggle('danger', /삭제/.test(okLabel||''));
   confirmCallback = cb;
   document.getElementById('confirm-wrap').classList.add('open');
 }
