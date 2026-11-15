@@ -237,6 +237,27 @@ tr:hover td{background:#fafafa}
 .st-m{white-space:nowrap}
 .tab.on{color:#0b3d91;border-bottom:2px solid #0b3d91}
 @media(max-width:760px){.st-m{font-size:10px}.st-grid2{grid-template-columns:1fr}.st-hero{padding:18px}.st-hero-n{font-size:34px}.st-hero-r{width:100%}.st-kpi{flex:1;min-width:0}}
+
+/* ===== 재고 현황 · 거래 내역 개편 (남색 통일) ===== */
+#inv-summary,#hist-summary{margin-bottom:12px}
+#s-inv .st-hero,#s-hist .st-hero{margin-bottom:0}
+#s-inv .topbar,#s-hist .topbar{margin-top:12px}
+#s-inv .topbar input,#s-inv .topbar select,#s-hist .topbar input,#s-hist .topbar select{border-radius:999px;padding:9px 14px;border-color:#d5dcea;min-height:40px}
+#s-inv .btn-p{background:#0b3d91;border-color:#0b3d91;border-radius:999px;min-height:40px;padding:0 18px}
+#s-inv .chip{border-color:#d5dcea;color:#51607a;min-height:38px}
+#s-inv .chip.on{background:#0b3d91;border-color:#0b3d91;color:#fff;font-weight:700}
+#s-inv .tbl-wrap{border:1px solid #e3e8f2;border-radius:18px;box-shadow:0 2px 10px rgba(15,40,90,.05)}
+#s-inv th{background:#f3f6fc;color:#51607a;padding:12px 14px}
+#s-inv td{padding:12px 14px;border-bottom:1px solid #eef1f6}
+#s-inv tr:hover td{background:#f8faff}
+#s-inv td{white-space:nowrap}#s-inv td:first-child{white-space:normal;min-width:180px}
+#s-inv .icard{border:1px solid #e3e8f2;border-radius:18px;padding:14px 16px;box-shadow:0 2px 10px rgba(15,40,90,.05)}
+#s-inv .icard .nm{color:#1a2540}
+.inv-warn{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:#fff3df;color:#c26a0a;white-space:nowrap}
+#s-inv .days-left{border-radius:99px;padding:3px 9px;font-size:11px}
+#s-hist .card{border:1px solid #e3e8f2;border-radius:18px;padding:12px 18px;box-shadow:0 2px 10px rgba(15,40,90,.05)}
+#s-hist .dayhd{background:#f3f6fc;color:#0b2e6f;border-radius:10px;padding:9px 12px}
+#s-hist .hist-row{padding:12px 0;border-bottom:1px solid #eef1f6}
 </style>
 </head>
 <body>
@@ -295,13 +316,14 @@ tr:hover td{background:#fafafa}
 
 <!-- 재고현황 -->
 <div id="s-inv" class="sec">
+  <div id="inv-summary"></div>
   <div class="topbar">
     <input type="text" id="i-search" placeholder="부품명·규격 검색..." style="width:160px" oninput="renderInv()">
     <select id="i-cat" onchange="renderInv()"><option value="">전체 카테고리</option></select>
     <select id="i-st" onchange="renderInv()">
       <option value="">전체 상태</option><option value="ok">정상</option><option value="low">부족</option><option value="out">재고없음</option><option value="ondemand">주문형</option>
     </select>
-    <select id="i-sort" onchange="renderInv()"><option value="">이름순</option><option value="stock">재고 적은순</option></select>
+    <select id="i-sort" onchange="renderInv()"><option value="">이름순</option><option value="stock">재고 적은순</option><option value="days">소진 임박순</option><option value="value">재고금액 큰순</option></select>
     <button class="btn btn-p" onclick="openAdd()" style="margin-left:auto">+ 부품 추가</button>
   </div>
   <div class="chips" id="i-chips"></div>
@@ -311,7 +333,7 @@ tr:hover td{background:#fafafa}
       <thead><tr>
         <th>부품명</th><th>카테고리</th>
         <th style="text-align:right">재고</th><th style="text-align:right">최소</th>
-        <th style="text-align:right">매입가</th>
+        <th style="text-align:right">매입가</th><th style="text-align:right">재고금액</th><th style="text-align:center">소진 예상</th>
         <th style="text-align:center">상태</th><th></th>
       </tr></thead>
       <tbody id="inv-body"></tbody>
@@ -325,7 +347,9 @@ tr:hover td{background:#fafafa}
     <select id="h-type" onchange="renderHist()"><option value="">전체</option><option value="sale">판매</option><option value="in">입고</option></select>
     <select id="h-mon" onchange="renderHist()"><option value="">전체 기간</option></select>
     <select id="h-part" onchange="renderHist()"><option value="">전체 부품</option></select>
+    <input type="text" id="h-q" placeholder="부품명 검색..." style="width:160px" oninput="renderHist()">
   </div>
+  <div id="hist-summary"></div>
   <div class="card"><div id="hist-list"><div class="empty">불러오는 중...</div></div></div>
 </div>
 
@@ -801,30 +825,46 @@ const renderInv = () => {
   const st = document.getElementById('i-st')?.value||'';
   const sort = document.getElementById('i-sort')?.value||'';
   let list=parts.filter(p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st));
+  const dl=p=>p.ondemand?null:getDaysLeft(p.stock,getAvgMonthly(p._id));
   if(sort==='stock') list=[...list].sort((a,b)=>(a.ondemand?1e9:a.stock)-(b.ondemand?1e9:b.stock));
+  else if(sort==='days') list=[...list].sort((a,b)=>{const x=dl(a),y=dl(b);return (x===null?1e9:x)-(y===null?1e9:y);});
+  else if(sort==='value') list=[...list].sort((a,b)=>(b.ondemand?0:b.stock*(b.buy||0))-(a.ondemand?0:a.stock*(a.buy||0)));
   const cnt=k=>parts.filter(p=>(!k||stOf(p)===k)).length;
+  /* 상단 요약 */
+  const normal=parts.filter(p=>!p.ondemand);
+  const sv=normal.reduce((s,p)=>s+p.stock*(p.buy||0),0), sq=normal.reduce((s,p)=>s+p.stock,0);
+  const needN=parts.filter(p=>!p.ondemand&&stOf(p)!=='ok').length;
+  const noBuy=parts.filter(p=>!p.buy).length;
+  const soon=normal.filter(p=>{const d=dl(p);return d!==null&&d<=14;}).length;
+  const sumEl=document.getElementById('inv-summary');
+  if(sumEl) sumEl.innerHTML=`<div class="st-hero"><div><div class="st-hero-l">정상 재고 금액 <small style="opacity:.7;font-size:11px">매입가 기준</small></div><div class="st-hero-n">${stWon(sv)}</div><div class="st-hero-s"><span>관리 부품 <b>${parts.length}종</b></span><span>정상 재고 <b>${normal.length}종 · ${sq}개</b></span><span>주문형 <b>${parts.length-normal.length}종</b></span></div></div>
+    <div class="st-hero-r"><div class="st-kpi"><span>재고 확인 필요</span><b class="${needN?'dn':'up'}">${needN}종</b></div><div class="st-kpi"><span>2주 안 소진 예상</span><b class="${soon?'dn':'up'}">${soon}종</b></div><div class="st-kpi"><span>매입가 미입력</span><b class="${noBuy?'dn':'up'}">${noBuy}종</b></div></div></div>`;
   document.getElementById('i-chips').innerHTML=[['','전체'],['low','부족'],['out','재고없음'],['ok','정상'],['ondemand','주문형']].map(([k,l])=>`<button class="chip ${st===k?'on':''}" onclick="document.getElementById('i-st').value='${k}';renderInv()">${l} ${cnt(k)}</button>`).join('');
+  const daysTag=p=>{const d=dl(p);if(d===null)return '';const cls=d<=7?'days-danger':d<=30?'days-warn':'days-ok';return `<span class="days-left ${cls}">약 ${d}일치</span>`;};
+  const noBuyTag=p=>p.buy?'':'<span class="inv-warn">매입가 미입력</span>';
   document.getElementById('inv-cards').innerHTML=list.length?list.map(p=>`
     <div class="icard">
-      <div style="flex:1;min-width:0"><div class="nm">${esc(p.name)}</div><div class="sp">${p.spec?esc(p.spec)+' · ':''}${p.cat} · 매입 ${p.buy.toLocaleString()}원</div>
-        <div style="margin-top:6px">${badgeSt(stOf(p))}</div></div>
+      <div style="flex:1;min-width:0"><div class="nm">${esc(p.name)}</div><div class="sp">${p.spec?esc(p.spec)+' · ':''}${p.cat} · 매입 ${(p.buy||0).toLocaleString()}원${p.ondemand?'':' · 재고금액 '+stK(p.stock*(p.buy||0))+'원'}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">${badgeSt(stOf(p))}${daysTag(p)}${noBuyTag(p)}</div></div>
       <div class="big">${p.ondemand?'-':p.stock}<small>${p.ondemand?'주문형':'최소 '+p.min}</small></div>
       <div style="display:flex;flex-direction:column;gap:6px"><button class="btn" style="padding:6px 12px;font-size:12px" onclick="openEdit('${p._id}')">수정</button>
       <button class="btn btn-d" style="padding:6px 12px;font-size:12px" onclick="delPart('${p._id}')">삭제</button></div>
     </div>`).join(''):'<div class="empty">해당 부품 없음</div>';
   document.getElementById('inv-body').innerHTML=list.length?list.map(p=>`
     <tr>
-      <td>${p.name}<br><span style="font-size:11px;color:#888">${p.spec||''}</span></td>
+      <td>${esc(p.name)}<br><span style="font-size:11px;color:#8a97ad">${esc(p.spec||'')}</span></td>
       <td><span class="badge b-gray" style="font-size:10px">${p.cat}</span></td>
-      <td style="text-align:right;font-weight:700">${p.stock}</td>
+      <td style="text-align:right;font-weight:700">${p.ondemand?'-':p.stock}</td>
       <td style="text-align:right;color:#aaa">${p.min}</td>
-      <td style="text-align:right">${p.buy.toLocaleString()}원</td>
+      <td style="text-align:right">${p.buy?p.buy.toLocaleString()+'원':'<span class="inv-warn">미입력</span>'}</td>
+      <td style="text-align:right;color:#51607a">${p.ondemand||!p.buy?'-':stK(p.stock*p.buy)+'원'}</td>
+      <td style="text-align:center">${daysTag(p)||'<span style="color:#c3cad6">-</span>'}</td>
       <td style="text-align:center">${badgeSt(stOf(p))}</td>
       <td><div style="display:flex;gap:4px">
         <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openEdit('${p._id}')">수정</button>
         <button class="btn btn-d" style="font-size:11px;padding:4px 8px" onclick="delPart('${p._id}')">삭제</button>
       </div></td>
-    </tr>`).join(''):'<tr><td colspan="7" style="color:#aaa;padding:16px">해당 부품 없음</td></tr>';
+    </tr>`).join(''):'<tr><td colspan="9" style="color:#aaa;padding:16px">해당 부품 없음</td></tr>';
 };
 window.renderInv = renderInv;
 
@@ -834,27 +874,39 @@ const renderHist = () => {
   const ht=document.getElementById('h-type').value;
   const hm=document.getElementById('h-mon').value;
   const hp=document.getElementById('h-part').value;
-  const list=hist.filter(h=>(!ht||h.type===ht)&&(!hm||ymKey(h.date)===hm)&&(!hp||h.pid===hp));
-  const sig=ht+'|'+hm+'|'+hp; if(sig!==histSig){histSig=sig;histLimit=30;}
+  const hq=(document.getElementById('h-q')?.value||'').trim().toLowerCase();
+  const pById={}; parts.forEach(p=>{pById[p._id]=p;});
+  const unit=h=>Number(h.price)||(pById[h.pid]&&pById[h.pid].buy)||0;
+  const list=hist.filter(h=>(!ht||h.type===ht)&&(!hm||ymKey(h.date)===hm)&&(!hp||h.pid===hp)&&(!hq||(String(h.pname)+' '+String(h.pspec||'')).toLowerCase().includes(hq)));
+  const sig=ht+'|'+hm+'|'+hp+'|'+hq; if(sig!==histSig){histSig=sig;histLimit=30;}
+  /* 상단 요약 */
+  const sale=list.filter(h=>h.type==='sale'), inn=list.filter(h=>h.type!=='sale');
+  const sq=sale.reduce((s,h)=>s+h.qty,0), iq=inn.reduce((s,h)=>s+h.qty,0), sa=sale.reduce((s,h)=>s+unit(h)*h.qty,0);
+  const sumEl=document.getElementById('hist-summary');
+  if(sumEl) sumEl.innerHTML=`<div class="st-hero"><div><div class="st-hero-l">${hm?hm.replace('-','년 ')+'월':'전체 기간'} 판매 <small style="opacity:.7;font-size:11px">조건에 맞는 내역 기준</small></div><div class="st-hero-n">${sq}<small>개</small></div><div class="st-hero-s"><span>판매 원가 <b>${stWon(sa)}</b></span><span>판매 <b>${sale.length}건</b></span></div></div>
+    <div class="st-hero-r"><div class="st-kpi"><span>입고</span><b>${iq}개</b></div><div class="st-kpi"><span>전체 내역</span><b>${list.length}건</b></div></div></div>`;
   const shown=list.slice(0,histLimit);
   const byDay={}; shown.forEach(h=>{(byDay[h.date]=byDay[h.date]||[]).push(h);});
   const wd=['일','월','화','수','목','금','토'];
   document.getElementById('hist-list').innerHTML=shown.length?Object.keys(byDay).map(day=>{
-    const rows=byDay[day]; const sq=rows.filter(h=>h.type==='sale').reduce((s,h)=>s+h.qty,0), iq=rows.filter(h=>h.type!=='sale').reduce((s,h)=>s+h.qty,0);
+    const rows=byDay[day]; const dsq=rows.filter(h=>h.type==='sale').reduce((s,h)=>s+h.qty,0), diq=rows.filter(h=>h.type!=='sale').reduce((s,h)=>s+h.qty,0);
     const dt=new Date(day+'T00:00:00');
-    return `<div class="dayhd"><span>${dt.getMonth()+1}월 ${dt.getDate()}일 (${wd[dt.getDay()]})</span><span>${sq?'판매 '+sq+'개':''}${sq&&iq?' · ':''}${iq?'입고 '+iq+'개':''}</span></div>`+rows.map(h=>`
+    return `<div class="dayhd"><span>${dt.getMonth()+1}월 ${dt.getDate()}일 (${wd[dt.getDay()]})</span><span>${dsq?'판매 '+dsq+'개':''}${dsq&&diq?' · ':''}${diq?'입고 '+diq+'개':''}</span></div>`+rows.map(h=>{
+      const amt=h.type==='sale'?unit(h)*h.qty:0;
+      return `
     <div class="hist-row">
-      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
         <span class="badge ${h.type==='sale'?'b-blue':'b-ok'}" style="flex-shrink:0;white-space:nowrap">${h.type==='sale'?'판매':'입고'}</span>
         <div style="min-width:0">
-          <div style="overflow-wrap:anywhere">${esc(shortName(h.pname))}${h.pspec?` <span style="font-size:11px;color:#888">(${esc(shortName(h.pspec))})</span>`:''} <span style="font-size:11px;color:#aaa;margin-left:4px">${esc(h.user||'')}</span></div>
+          <div style="overflow-wrap:anywhere;font-weight:600;color:#1a2540">${esc(shortName(h.pname))}${h.pspec?` <span style="font-size:11px;color:#8a97ad;font-weight:400">(${esc(stClip(shortName(h.pspec),34))})</span>`:''}</div>
+          <div style="font-size:11px;color:#98a4b8;margin-top:2px">${esc(h.user||'')}${amt?' · 원가 '+stK(amt)+'원':''}</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-        <div style="font-weight:600;white-space:nowrap">${h.type==='sale'?'−':'+'}${h.qty}개</div>
+        <div style="font-weight:700;white-space:nowrap;color:${h.type==='sale'?'#0b3d91':'#168a58'}">${h.type==='sale'?'−':'+'}${h.qty}개</div>
         <button onclick="deleteHist('${h._id}')" style="font-size:11px;color:#aaa;background:none;border:none;cursor:pointer;padding:6px;white-space:nowrap">삭제</button>
       </div>
-    </div>`).join('');}).join('')+(list.length>histLimit?`<button class="btn" style="width:100%;margin-top:12px;padding:12px" onclick="histLimit+=30;renderHist()">더 보기 (${list.length-histLimit}건 남음)</button>`:''):'<div class="empty">내역 없음</div>';
+    </div>`;}).join('');}).join('')+(list.length>histLimit?`<button class="btn" style="width:100%;margin-top:12px;padding:12px" onclick="histLimit+=30;renderHist()">더 보기 (${list.length-histLimit}건 남음)</button>`:''):'<div class="empty">내역 없음</div>';
   const months=[...new Set(hist.map(h=>ymKey(h.date)))].sort().reverse();
   const msel=document.getElementById('h-mon');const cv=msel.value;
   msel.innerHTML='<option value="">전체 기간</option>'+months.map(m=>`<option value="${m}"${m===cv?' selected':''}>${m}</option>`).join('');
