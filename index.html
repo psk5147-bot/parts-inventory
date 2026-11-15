@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="재고 관리">
 <title>재고 관리</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px}
@@ -165,6 +166,77 @@ tr:hover td{background:#fafafa}
   .edit-sm{display:inline-block}
 }
 /*topfix*/@media (hover:none) and (pointer:coarse){.app{padding-top:calc(env(safe-area-inset-top,0px) + 36px)}}
+
+/* ===== 통계 탭 (남색 통일 테마) ===== */
+#s-dash{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.st-top{display:flex;align-items:flex-end;justify-content:space-between;margin:2px 2px 12px}
+.st-eyebrow{font-size:12px;color:#5b6b86;font-weight:500}
+.st-h1{font-size:26px;font-weight:700;color:#0b2e6f;letter-spacing:-1px}
+.st-year{background:#0b3d91;color:#fff;border:none;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;appearance:none;-webkit-appearance:none;text-align:center}
+.st-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+.st-chips::-webkit-scrollbar{display:none}
+.st-chip{flex:none;padding:7px 14px;border-radius:999px;border:1px solid #d5dcea;background:#fff;color:#51607a;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.st-chip.on{background:#0b3d91;border-color:#0b3d91;color:#fff;font-weight:700}
+.st-hero{display:flex;gap:18px;justify-content:space-between;align-items:stretch;flex-wrap:wrap;background:linear-gradient(135deg,#0a2a66 0%,#0b3d91 55%,#1d58c9 100%);border-radius:20px;padding:22px 24px;color:#fff;box-shadow:0 10px 30px rgba(11,61,145,.25);margin-bottom:12px}
+.st-hero-l{font-size:13px;opacity:.8;margin-bottom:6px}
+.st-hero-n{font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1.05}
+.st-hero-n small{font-size:18px;font-weight:500;margin-left:3px;opacity:.85}
+.st-hero-s{display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:12px;font-size:12px;opacity:.92}
+.st-hero-s b{font-weight:700}
+.st-hero-r{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.st-kpi{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 14px;min-width:96px;display:flex;flex-direction:column;gap:3px}
+.st-kpi span{font-size:11px;opacity:.8}.st-kpi b{font-size:16px;font-weight:700;letter-spacing:-.4px}
+.st-kpi b.up{color:#9ff0c4}.st-kpi b.dn{color:#ffb4ab}
+.st-card{background:#fff;border:1px solid #e3e8f2;border-radius:18px;padding:16px 18px;box-shadow:0 2px 10px rgba(15,40,90,.05);margin-bottom:12px}
+.st-card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.st-card-t{font-size:14px;font-weight:700;color:#0b2e6f;margin-bottom:12px}
+.st-card-h .st-card-t{margin-bottom:6px}
+.st-card-t small{font-size:11px;font-weight:400;color:#8a97ad;margin-left:6px}
+.st-seg{display:flex;background:#eef1f6;border-radius:999px;padding:3px}
+.st-seg button{border:none;background:none;padding:5px 12px;border-radius:999px;font-size:12px;color:#51607a;cursor:pointer;font-family:inherit;font-weight:500}
+.st-seg button.on{background:#0b3d91;color:#fff;font-weight:700}
+.st-flow-sum{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#7b88a0;margin:2px 0 10px}
+.st-flow-sum b{color:#1a2540}.st-flow-sum b.hl{color:#0b3d91}
+.st-flow{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:5px;align-items:end;height:190px}
+.st-avg{position:absolute;left:0;right:0;border-top:1.5px dashed #b4c2dc;pointer-events:none}
+.st-col{cursor:pointer;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;height:100%;border-radius:10px}
+.st-col.on{background:#eaf0fc}
+.st-v{font-size:10px;color:#6b7a94;height:16px}
+.st-bar{width:68%;max-width:30px;margin:0 auto;background:linear-gradient(180deg,#4f8df0,#0b3d91);border-radius:6px 6px 0 0}
+.st-bar.fut{background:#eef1f6}
+.st-m{font-size:11px;margin-top:6px;height:18px;color:#8a97ad}.st-col.on .st-m{color:#0b3d91;font-weight:700}
+.st-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+.st-grid2>.st-card{margin-bottom:12px}
+.st-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eef1f6}
+.st-row:last-child{border-bottom:none}
+.st-row-m{min-width:0}
+.st-nm{font-size:13.5px;font-weight:600;color:#1a2540;overflow-wrap:anywhere}
+.st-sub{font-size:11.5px;color:#8a97ad;margin-top:2px}
+.st-tag{flex:none;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.st-tag.ok{background:#e6f6ee;color:#168a58}.st-tag.warn{background:#fff3df;color:#c26a0a}.st-tag.bad{background:#fde8e6;color:#d64545}
+.st-val{flex:none;font-size:13.5px;color:#0b2e6f}
+.st-idle-sum{background:#f3f6fc;border-radius:12px;padding:10px 12px;font-size:12.5px;color:#51607a;margin-bottom:6px}
+.st-idle-sum b{color:#0b2e6f;font-size:14px}
+.st-empty{color:#98a4b8;font-size:13px;padding:14px 0;text-align:center}
+.st-hb{margin-bottom:14px}.st-hb:last-child{margin-bottom:0}
+.st-hb-t{display:flex;justify-content:space-between;font-size:12.5px;color:#33415c;margin-bottom:6px;gap:8px}
+.st-hb-t b{color:#0b2e6f;font-weight:700;white-space:nowrap}
+.st-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.st-track{height:8px;background:#eef1f6;border-radius:99px;overflow:hidden}
+.st-track i{display:block;height:100%;border-radius:99px;min-width:2px}
+.st-rank{display:flex;gap:12px;align-items:center;padding:9px 0}
+.st-rn{width:24px;height:24px;border-radius:50%;background:#eef1f6;color:#51607a;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.st-rn.top{background:#0b3d91;color:#fff}
+.st-rank-m{flex:1;min-width:0}
+.st-rank-t{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:5px}
+.st-rank-t b{font-size:14px;color:#0b2e6f;white-space:nowrap}.st-rank-t b small{font-size:11px;color:#8a97ad;font-weight:400}
+.st-rank-t em{font-style:normal;font-size:10.5px;background:#eef1f6;color:#6b7a94;border-radius:6px;padding:1px 7px;margin-left:4px;font-weight:500}
+.st-rank-t em.od{background:#f3e8ff;color:#6b21a8}
+.st-more{width:100%;margin-top:8px;padding:11px;border:1px solid #d5dcea;background:#fff;border-radius:12px;color:#0b3d91;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+  .st-note{font-size:11px;color:#8a97ad;line-height:1.6;margin:14px 4px 6px}
+.st-m{white-space:nowrap}
+.tab.on{color:#0b3d91;border-bottom:2px solid #0b3d91}
+@media(max-width:760px){.st-m{font-size:10px}.st-grid2{grid-template-columns:1fr}.st-hero{padding:18px}.st-hero-n{font-size:34px}.st-hero-r{width:100%}.st-kpi{flex:1;min-width:0}}
 </style>
 </head>
 <body>
@@ -258,30 +330,7 @@ tr:hover td{background:#fafafa}
 </div>
 
 <!-- 통계 -->
-<div id="s-dash" class="sec">
-  <div class="topbar" style="margin-bottom:12px">
-    <select id="dash-mon" onchange="renderDash()" style="font-size:14px;padding:8px 10px"><option value="">이번달</option></select>
-    <span id="dash-mon-label" style="font-size:12px;color:#888"></span>
-  </div>
-  <div class="cards" id="d-metrics"></div>
-  <div class="card">
-    <div class="card-hd" id="trend-title" style="margin-bottom:6px">월별 판매 흐름</div>
-    <div id="d-flow-sum" style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;font-size:12px;color:#667"></div>
-    <div id="d-flow"></div>
-    <div style="font-size:11px;color:#99a;margin-top:8px">막대를 누르면 그 달의 순위를 볼 수 있어요</div>
-  </div>
-  <div class="dash-grid">
-    <div class="card"><div class="card-hd">재고 확인 필요</div><div id="d-low"></div></div>
-    <div class="card"><div class="card-hd" id="d-top-title">이번달 판매 TOP</div><div id="d-top"></div></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="card-hd" style="margin-bottom:0" id="d-annual-title">연간 판매 순위</div>
-      <select id="annual-year" onchange="renderDash()" style="font-size:12px;padding:6px 8px"></select>
-    </div>
-    <div id="d-annual"></div>
-  </div>
-</div>
+<div id="s-dash" class="sec"><div id="st-root"></div></div>
 
 </div><!-- /.app -->
 </div><!-- /#main-app -->
@@ -817,83 +866,83 @@ Object.defineProperty(window,"histLimit",{get:()=>histLimit,set:v=>{histLimit=v;
 
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const shortName = s => String(s).startsWith('공장 직송')?'공장 직송':String(s).replace(/\s*\(공장 직송[^)]*(\([^)]*\)[^)]*)*\)/,'').trim();
+let dashSel='', dashYear='', dashMetric='qty', topLimit=10;
+window.setDashSel=v=>{dashSel=v;topLimit=10;renderDash();};
+window.setDashYear=y=>{dashYear=y;dashSel='Y:'+y;topLimit=10;renderDash();};
+window.setDashMetric=m=>{dashMetric=m;renderDash();};
+window.pickMonth=m=>{setDashSel(m);};
+window.dashMore=()=>{topLimit+=15;renderDash();};
+const stK=n=>{const a=Math.abs(n),s=n<0?'-':'';if(a>=1e8)return s+(a/1e8).toFixed(2).replace(/\.?0+$/,'')+'억';if(a>=1e4)return s+Math.round(a/1e4).toLocaleString('ko-KR')+'만';return s+Math.round(a).toLocaleString('ko-KR');};
+const stClip=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n)+'…':s;};
+const stWon=n=>(n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('ko-KR')+'원';
 const renderDash = () => {
-  const allSales = hist.filter(h=>h.type==='sale');
-  const monSel=document.getElementById('dash-mon');
-  const curMon=monSel.value;
-  const allMonths=[...new Set(allSales.map(h=>ymKey(h.date)))].sort().reverse();
-  monSel.innerHTML='<option value="">이번달</option>'+allMonths.map(m=>`<option value="${m}"${m===curMon?' selected':''}>${m}</option>`).join('');
-  const selectedMon = monSel.value || thisMonth();
-  const label = monSel.value ? monSel.value.replace('-','년 ')+'월' : '이번달';
-  const ms = allSales.filter(h=>ymKey(h.date)===selectedMon);
-  const totalQ=ms.reduce((s,h)=>s+h.qty,0);
+  const root=document.getElementById('st-root'); if(!root) return;
+  const pById={}; parts.forEach(p=>{pById[p._id]=p;});
+  const allSales=hist.filter(h=>h.type==='sale').map(h=>{const p=pById[h.pid];const unit=Number(h.price)||(p&&p.buy)||0;return Object.assign({},h,{_amt:unit*h.qty,_p:p,_cat:(p&&p.cat)||'기타',_od:!!(p&&p.ondemand)});});
+  const nowY=String(new Date().getFullYear()), nowM=thisMonth();
+  const years=[...new Set(allSales.map(h=>h.date.slice(0,4)))].sort().reverse(); if(!years.includes(nowY)) years.unshift(nowY);
+  if(!dashYear||!years.includes(dashYear)) dashYear=nowY;
+  if(!dashSel) dashSel=nowM;
+  const isYear=dashSel.startsWith('Y:');
+  if(isYear) dashYear=dashSel.slice(2); else if(dashSel.slice(0,4)!==dashYear) dashYear=dashSel.slice(0,4);
+  const yr=dashYear;
+  const mset=Array.from({length:12},(_,i)=>yr+'-'+String(i+1).padStart(2,'0'));
+  const inSel=h=>isYear?h.date.startsWith(yr):ymKey(h.date)===dashSel;
+  const ms=allSales.filter(inSel);
+  const sum=(a,f)=>a.reduce((s,h)=>s+f(h),0);
+  const qty=sum(ms,h=>h.qty), amt=sum(ms,h=>h._amt);
+  const kinds=new Set(ms.map(h=>h.pid+(h.pspec||''))).size;
+  const odQ=sum(ms.filter(h=>h._od),h=>h.qty), nmQ=qty-odQ;
+  const monQ=mset.map(m=>sum(allSales.filter(h=>ymKey(h.date)===m),h=>h.qty));
+  const monA=mset.map(m=>sum(allSales.filter(h=>ymKey(h.date)===m),h=>h._amt));
+  const vals=dashMetric==='amt'?monA:monQ;
+  const doneIdx=mset.map((m,i)=>i).filter(i=>mset[i]<nowM&&monQ[i]>0);
+  const avgQ=doneIdx.length?Math.round(doneIdx.reduce((a,i)=>a+monQ[i],0)/doneIdx.length):0;
+  const avgV=doneIdx.length?doneIdx.reduce((a,i)=>a+vals[i],0)/doneIdx.length:0;
+  const maxV=Math.max(1,...vals); const bestI=vals.indexOf(Math.max(...vals));
+  const fmtV=v=>dashMetric==='amt'?stK(v):String(v);
+  const normal=parts.filter(p=>!p.ondemand);
+  const stockVal=sum(normal,p=>p.stock*(p.buy||0)), stockQty=sum(normal,p=>p.stock);
   const need=parts.filter(p=>stOf(p)!=='ok'&&!p.ondemand);
-  document.getElementById('d-top-title').textContent=`${label} 판매 순위`;
-  document.getElementById('d-metrics').innerHTML=`
-    <div class="mcard"><div class="mcard-l">${label} 판매수량</div><div class="mcard-v" style="color:#185dd4">${totalQ}개</div></div>
-    <div class="mcard"><div class="mcard-l">판매된 품목</div><div class="mcard-v">${new Set(ms.map(h=>h.pid)).size}종</div></div>
-    <div class="mcard"><div class="mcard-l">관리 중인 부품</div><div class="mcard-v">${parts.length}종</div></div>
-    <div class="mcard"><div class="mcard-l">재고 확인 필요</div><div class="mcard-v" style="color:${need.length?'#bc5424':'#2E7D32'}">${need.length}종</div></div>`;
-
-  // 월별 흐름 (HTML 막대, 연도 선택은 아래 연간 순위와 연동)
-  const yrSel=document.getElementById('annual-year');
-  const years=[...new Set(allSales.map(h=>h.date.slice(0,4)))].sort().reverse();
-  const nowY=String(new Date().getFullYear());
-  const yr=yrSel.value||(years.includes(nowY)?nowY:years[0]||nowY);
-  yrSel.innerHTML=years.map(y=>`<option value="${y}"${y===yr?' selected':''}>${y}년</option>`).join('');
-  const mset=Array.from({length:12},(_,i)=>`${yr}-${String(i+1).padStart(2,'0')}`);
-  const vals=mset.map(m=>allSales.filter(h=>ymKey(h.date)===m).reduce((s,h)=>s+h.qty,0));
-  const nowM=thisMonth();
-  const done=vals.filter((v,i)=>mset[i]<nowM&&v>0);
-  const avg=done.length?Math.round(done.reduce((a,b)=>a+b,0)/done.length):0;
-  const maxV=Math.max(...vals,1), best=vals.indexOf(Math.max(...vals));
-  document.getElementById('trend-title').textContent=`${yr}년 월별 판매 흐름 (개)`;
-  document.getElementById('d-flow-sum').innerHTML=`<span>월평균 <b style="color:#111">${avg}개</b></span><span>최고 <b style="color:#185dd4">${best+1}월 ${vals[best]}개</b></span><span>연 합계 <b style="color:#111">${vals.reduce((a,b)=>a+b,0)}개</b></span>`;
-  document.getElementById('d-flow').innerHTML=`<div style="position:relative">${avg?`<div style="position:absolute;left:0;right:0;bottom:${24+avg/maxV*140}px;border-top:1px dashed #b9c3d3"></div>`:''}<div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:5px;align-items:end;height:190px">`+
-    vals.map((v,i)=>{const sel=mset[i]===selectedMon,future=mset[i]>nowM;return `<div onclick="pickMonth('${mset[i]}')" style="cursor:pointer;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;height:100%">
-      <div style="font-size:10px;color:#667;height:16px">${v||''}</div>
-      <div style="height:${v?Math.max(4,v/maxV*140):2}px;background:${sel?'#185dd4':future?'#eef1f5':'#c9d7ec'};border-radius:4px 4px 0 0"></div>
-      <div style="font-size:10px;margin-top:6px;height:18px;color:${sel?'#185dd4':'#7a8698'};font-weight:${sel?700:400}">${i+1}월</div></div>`}).join('')+`</div></div>
-    <div style="font-size:11px;color:#778;margin-top:4px">점선 = 월평균(지난 달까지)${yr===nowY?' · 이번 달은 진행 중':''}</div>`;
-
-  // 재고 확인 필요 (규격 포함)
-  need.sort((a,b)=>a.stock-b.stock);
-  document.getElementById('d-low').innerHTML=need.length?need.map(p=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #eef1f4">
-      <div style="min-width:0"><div style="font-size:14px;font-weight:600;overflow-wrap:anywhere">${esc(p.name)}</div><div style="font-size:12px;color:#778">${p.spec?esc(p.spec)+' · ':''}현재 ${p.stock}개</div></div>
-      ${badgeSt(stOf(p))}</div>`).join(''):'<div class="empty">재고 부족 없음</div>';
-
-  // 월 판매 순위
-  const map={};ms.forEach(h=>{
-    const key=h.pid+(h.pspec||'');
-    if(!map[key]) map[key]={n:shortName(h.pname)+(h.pspec?` (${shortName(h.pspec)})`:''),q:0};
-    map[key].q+=h.qty;
-  });
-  const top=Object.values(map).sort((a,b)=>b.q-a.q).slice(0,8);const mx=top[0]?.q||1;
-  document.getElementById('d-top').innerHTML=top.length?top.map((x,i)=>`
-    <div style="display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #eef1f4">
-      <span style="font-size:12px;color:#8490a1;width:16px;flex-shrink:0;padding-top:1px">${i+1}</span>
-      <div style="flex:1;min-width:0"><div style="font-size:14px;overflow-wrap:anywhere">${esc(x.n)}</div>
-      <div class="bar-o" style="height:5px"><div class="bar-i" style="height:5px;width:${Math.round(x.q/mx*100)}%;background:#3676de"></div></div></div>
-      <b style="font-size:15px;white-space:nowrap">${x.q}개</b></div>`).join(''):'<div class="empty">판매 없음</div>';
-
-  // 연간 순위 (상위 10 + 더보기)
-  document.getElementById('d-annual-title').textContent=`${yr}년 판매 순위`;
-  const amap={};
-  allSales.filter(h=>h.date.startsWith(yr)).forEach(h=>{
-    const key=h.pid+(h.pspec||'');
-    if(!amap[key]){const _p=parts.find(p=>p._id===h.pid);amap[key]={name:shortName(h.pname)+(h.pspec?` (${shortName(h.pspec)})`:''),qty:0,od:_p?.ondemand||false,stock:_p?.ondemand?null:(_p?.stock??null)};}
-    amap[key].qty+=h.qty;
-  });
-  const arr=Object.values(amap).sort((a,b)=>b.qty-a.qty), aMax=arr[0]?.qty||1;
-  const rowH=(x,i)=>`<div style="padding:10px 0;border-bottom:1px solid #eef1f4">
-    <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:12px;color:#8490a1;width:20px;flex-shrink:0">${i+1}</span>
-    <div style="flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere">${esc(x.name)}${x.od?' <span style="font-size:10px;background:#F3E8FF;color:#6B21A8;padding:1px 6px;border-radius:3px">주문형</span>':''}${!x.od&&x.stock!==null?` <span style="font-size:11px;color:#888;background:#f3f4f6;border-radius:3px;padding:1px 6px">재고 ${x.stock}</span>`:''}</div>
-    <b style="font-size:15px;white-space:nowrap">${x.qty}개</b></div>
-    <div class="bar-o" style="height:5px;margin-left:28px"><div class="bar-i" style="height:5px;width:${Math.round(x.qty/aMax*100)}%;background:${x.od?'#9F7AEA':'#3676de'}"></div></div></div>`;
-  document.getElementById('d-annual').innerHTML=arr.length?arr.slice(0,10).map(rowH).join('')+(arr.length>10?`<details><summary style="cursor:pointer;color:#185dd4;font-size:13px;padding:12px 0">나머지 ${arr.length-10}종 더 보기</summary>${arr.slice(10).map((x,i)=>rowH(x,i+10)).join('')}</details>`:''):'<div class="empty">판매 내역 없음</div>';
+  let delta='';
+  if(!isYear){const [y,m]=dashSel.split('-').map(Number);const pk=m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0');const pq=sum(allSales.filter(h=>ymKey(h.date)===pk),h=>h.qty);
+    if(pq>0){const d=qty-pq;delta='<div class="st-kpi"><span>전월 대비</span><b class="'+(d>=0?'up':'dn')+'">'+(d>0?'▲ ':d<0?'▼ ':'')+Math.abs(d)+'개</b></div>';}}
+  else if(avgQ){delta='<div class="st-kpi"><span>월평균</span><b>'+avgQ+'개</b></div>';}
+  const label=isYear?yr+'년 연간':dashSel.replace('-','년 ')+'월';
+  let h='';
+  h+='<div class="st-top"><div><div class="st-eyebrow">화천이티씨</div><div class="st-h1">재고 통계</div></div><select class="st-year" onchange="setDashYear(this.value)">'+years.map(y=>'<option value="'+y+'"'+(y===yr?' selected':'')+'>'+y+'년</option>').join('')+'</select></div>';
+  const chipM=mset.filter((m,i)=>monQ[i]>0||m===nowM);
+  h+='<div class="st-chips"><button class="st-chip'+(isYear?' on':'')+'" onclick="setDashSel(\'Y:'+yr+'\')">연간</button>'+chipM.map(m=>'<button class="st-chip'+(dashSel===m?' on':'')+'" onclick="setDashSel(\''+m+'\')">'+parseInt(m.slice(5))+'월</button>').join('')+'</div>';
+  h+='<div class="st-hero"><div><div class="st-hero-l">'+label+' 출고</div><div class="st-hero-n">'+qty+'<small>개</small></div><div class="st-hero-s"><span>원가 기준 <b>'+stWon(amt)+'</b></span><span>품목 <b>'+kinds+'종</b></span><span>정상 <b>'+nmQ+'개</b> · 주문형 <b>'+odQ+'개</b></span></div></div>'
+   +'<div class="st-hero-r">'+delta+'<div class="st-kpi"><span>정상 재고 금액</span><b>'+stK(stockVal)+'원</b></div><div class="st-kpi"><span>재고 확인 필요</span><b class="'+(need.length?'dn':'up')+'">'+need.length+'종</b></div></div></div>';
+  /* 월별 흐름 */
+  h+='<div class="st-card"><div class="st-card-h"><div class="st-card-t">'+yr+'년 월별 출고 흐름<small>막대를 누르면 그 달로 이동</small></div><div class="st-seg"><button class="'+(dashMetric==='qty'?'on':'')+'" onclick="setDashMetric(\'qty\')">수량</button><button class="'+(dashMetric==='amt'?'on':'')+'" onclick="setDashMetric(\'amt\')">원가금액</button></div></div>'
+   +'<div class="st-flow-sum"><span>월평균 <b>'+(dashMetric==='amt'?stK(avgV)+'원':avgQ+'개')+'</b></span>'+(vals[bestI]>0?'<span>최고 <b class="hl">'+(bestI+1)+'월 '+(dashMetric==='amt'?stK(vals[bestI])+'원':vals[bestI]+'개')+'</b></span>':'')+'<span>연 합계 <b>'+(dashMetric==='amt'?stK(monA.reduce((a,b)=>a+b,0))+'원':monQ.reduce((a,b)=>a+b,0)+'개')+'</b></span></div>'
+   +'<div class="st-flow">'+(avgV?'<div class="st-avg" style="bottom:'+(26+avgV/maxV*130)+'px"></div>':'')
+   +vals.map((v,i)=>{const sel=!isYear&&mset[i]===dashSel,fut=mset[i]>nowM;return '<div class="st-col'+(sel?' on':'')+'" onclick="'+(monQ[i]>0?"setDashSel('"+mset[i]+"')":'')+'"><div class="st-v">'+(v?fmtV(v):'')+'</div><div class="st-bar'+(fut||!v?' fut':'')+'" style="height:'+(v?Math.max(4,v/maxV*130):2)+'px"></div><div class="st-m">'+(i+1)+'월</div></div>';}).join('')+'</div></div>';
+  /* 소진 예측 + 안 팔리는 재고 */
+  const fc=normal.map(p=>{const avg=getAvgMonthly(p._id);const days=getDaysLeft(p.stock,avg);return {p,avg,days,st:stOf(p)};}).filter(x=>x.st!=='ok'||(x.days!==null&&x.days<=45)).sort((a,b)=>{const da=a.st==='out'?-1:(a.days===null?9999:a.days),db=b.st==='out'?-1:(b.days===null?9999:b.days);return da-db;});
+  h+='<div class="st-grid2"><div class="st-card"><div class="st-card-t">곧 떨어질 부품<small>최근 3개월 판매 속도 기준</small></div>'
+   +(fc.length?fc.slice(0,12).map(x=>{const p=x.p;const cls=x.st==='out'?'bad':(x.days!==null&&x.days<=14)||x.st==='low'?'warn':'ok';const tag=x.st==='out'?'재고 없음':x.st==='low'?'부족'+(x.days!==null?' · 약 '+x.days+'일':''):'약 '+x.days+'일';return '<div class="st-row"><div class="st-row-m"><div class="st-nm">'+esc(shortName(p.name))+'</div><div class="st-sub">'+(p.spec?esc(stClip(p.spec,28))+' · ':'')+'재고 '+p.stock+'개'+(x.avg>0?' · 월 '+(Math.round(x.avg*10)/10)+'개씩 판매':'')+'</div></div><span class="st-tag '+cls+'">'+tag+'</span></div>';}).join(''):'<div class="st-empty">곧 떨어질 부품이 없어요</div>')+'</div>';
+  const idleCut=new Date();idleCut.setDate(idleCut.getDate()-90);const idleKey=idleCut.toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
+  const lastSale={};allSales.forEach(s=>{if(!lastSale[s.pid]||s.date>lastSale[s.pid])lastSale[s.pid]=s.date;});
+  const idle=normal.filter(p=>p.stock>0&&(!lastSale[p._id]||lastSale[p._id]<idleKey)).map(p=>({p,val:p.stock*(p.buy||0),last:lastSale[p._id]||''})).sort((a,b)=>b.val-a.val);
+  const idleVal=sum(idle,x=>x.val);
+  h+='<div class="st-card"><div class="st-card-t">안 팔리는 재고<small>90일 이상 판매 없음</small></div>'+(idle.length?'<div class="st-idle-sum">묶여 있는 금액 <b>'+stWon(idleVal)+'</b> · '+idle.length+'종</div>'+idle.slice(0,12).map(x=>'<div class="st-row"><div class="st-row-m"><div class="st-nm">'+esc(shortName(x.p.name))+'</div><div class="st-sub">'+(x.p.spec?esc(stClip(x.p.spec,28))+' · ':'')+'재고 '+x.p.stock+'개 · '+(x.last?'마지막 판매 '+x.last.slice(5).replace('-','/'):'판매 기록 없음')+'</div></div><b class="st-val">'+(x.val>0?stK(x.val)+'원':'<span style="color:#98a4b8;font-weight:500">원가 미입력</span>')+'</b></div>').join(''):'<div class="st-empty">90일 넘게 안 팔린 재고가 없어요</div>')+'</div></div>';
+  /* 카테고리 · 유형 */
+  const CC={'선반용':'#1d4ed8','밀링용':'#0d9488','기타':'#d9910a'};
+  const cats=['선반용','밀링용','기타'].map(c=>({c,q:sum(ms.filter(x=>x._cat===c),x=>x.qty),a:sum(ms.filter(x=>x._cat===c),x=>x._amt)})).filter(x=>x.q>0);
+  const cmaxQ=Math.max(1,...cats.map(x=>x.q));
+  h+='<div class="st-grid2"><div class="st-card"><div class="st-card-t">카테고리별 출고<small>'+label+'</small></div>'+(cats.length?cats.map(x=>'<div class="st-hb"><div class="st-hb-t"><span><i class="st-dot" style="background:'+CC[x.c]+'"></i>'+x.c+'</span><b>'+x.q+'개 · '+stK(x.a)+'원</b></div><div class="st-track"><i style="width:'+(x.q/cmaxQ*100)+'%;background:'+CC[x.c]+'"></i></div></div>').join(''):'<div class="st-empty">출고 없음</div>')+'</div>'
+   +'<div class="st-card"><div class="st-card-t">정상 · 주문형 비교<small>'+label+'</small></div>'+(qty?[['정상 재고 출고',nmQ,sum(ms.filter(x=>!x._od),x=>x._amt),'#0b3d91'],['주문형(공장 직송) 출고',odQ,sum(ms.filter(x=>x._od),x=>x._amt),'#7c3aed']].map(r=>'<div class="st-hb"><div class="st-hb-t"><span><i class="st-dot" style="background:'+r[3]+'"></i>'+r[0]+'</span><b>'+r[1]+'개 · '+stK(r[2])+'원</b></div><div class="st-track"><i style="width:'+(qty?r[1]/qty*100:0)+'%;background:'+r[3]+'"></i></div></div>').join(''):'<div class="st-empty">출고 없음</div>')+'</div></div>';
+  /* 판매 순위 */
+  const map={};ms.forEach(x=>{const key=x.pid+(x.pspec||'');if(!map[key])map[key]={n:shortName(x.pname)+(x.pspec?' ('+shortName(x.pspec)+')':''),q:0,a:0,od:x._od,stock:x._od?null:(x._p?x._p.stock:null)};map[key].q+=x.qty;map[key].a+=x._amt;});
+  const top=Object.values(map).sort((a,b)=>b.q-a.q||b.a-a.a);const tm=top[0]?.q||1;
+  h+='<div class="st-card"><div class="st-card-t">'+label+' 판매 순위<small>수량 기준 · 금액은 원가</small></div>'+(top.length?top.slice(0,topLimit).map((x,i)=>'<div class="st-rank"><span class="st-rn'+(i<3?' top':'')+'">'+(i+1)+'</span><div class="st-rank-m"><div class="st-rank-t"><span class="st-nm">'+esc(x.n)+(x.od?' <em class="od">주문형</em>':(x.stock!==null?' <em>재고 '+x.stock+'</em>':''))+'</span><b>'+x.q+'개<small> '+stK(x.a)+'원</small></b></div><div class="st-track"><i style="width:'+Math.round(x.q/tm*100)+'%;background:'+(x.od?'#8b5cf6':'#2f6fe0')+'"></i></div></div></div>').join('')+(top.length>topLimit?'<button class="st-more" onclick="dashMore()">더 보기 ('+(top.length-topLimit)+'종 남음)</button>':''):'<div class="st-empty">판매 내역 없음</div>')+'</div>';
+  const zero=ms.filter(x=>!x._amt).length;
+  if(zero) h+='<div class="st-note">원가가 입력되지 않은 출고 '+zero+'건은 금액에서 0원으로 계산돼요. 재고 현황에서 매입가를 넣으면 금액이 정확해져요.</div>';
+  root.innerHTML=h;
 };
-window.pickMonth = m => { const s=document.getElementById('dash-mon'); if(![...s.options].some(o=>o.value===m)){ showToast('이 달은 판매 내역이 없어요'); return; } s.value=(m===thisMonth()?'':m); renderDash(); };
 window.renderDash = renderDash;
 
 const fillCatSelects = () => {
