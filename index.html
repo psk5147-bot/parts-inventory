@@ -186,6 +186,8 @@ tr:hover td{background:#fafafa}
 .st-hero-r{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .st-kpi{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 14px;min-width:96px;display:flex;flex-direction:column;gap:3px}
 .st-kpi span{font-size:11px;opacity:.8}.st-kpi b{font-size:16px;font-weight:700;letter-spacing:-.4px}
+.st-kpi.clk{cursor:pointer;transition:background .15s,transform .1s}.st-kpi.clk:hover{background:rgba(255,255,255,.22)}.st-kpi.clk:active{transform:scale(.97)}.st-kpi.clk.on{background:#fff;border-color:#fff}.st-kpi.clk.on span{color:#51607a;opacity:1}.st-kpi.clk.on b.dn{color:#d1342b}.st-kpi.clk.on b.up{color:#16824a}
+.kpi-note{margin-top:10px;padding:10px 14px;border-radius:12px;background:#eef3ff;color:#1c3d8f;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px}.kpi-note button{border:1px solid #b9c8f0;background:#fff;color:#1c3d8f;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
 .st-kpi b.up{color:#9ff0c4}.st-kpi b.dn{color:#ffb4ab}
 .st-card{background:#fff;border:1px solid #e3e8f2;border-radius:18px;padding:16px 18px;box-shadow:0 2px 10px rgba(15,40,90,.05);margin-bottom:12px}
 .st-card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:6px}
@@ -819,13 +821,17 @@ const renderQuick = () => {
 };
 window.renderQuick = renderQuick;
 
+let kpiF='';
+window.kpiF_reset=()=>{kpiF='';};
+window.setKpi=k=>{kpiF=(kpiF===k?'':k);renderInv();};
 const renderInv = () => {
   const q  =(document.getElementById('i-search')?.value||'').toLowerCase();
   const cat= document.getElementById('i-cat')?.value||'';
   const st = document.getElementById('i-st')?.value||'';
   const sort = document.getElementById('i-sort')?.value||'';
-  let list=parts.filter(p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st));
   const dl=p=>p.ondemand?null:getDaysLeft(p.stock,getAvgMonthly(p._id));
+  const kpiMatch=p=>!kpiF||(kpiF==='need'?(!p.ondemand&&stOf(p)!=='ok'):kpiF==='soon'?(!p.ondemand&&dl(p)!==null&&dl(p)<=14):kpiF==='nobuy'?!p.buy:true);
+  let list=parts.filter(p=>(!q||(p.name+' '+(p.spec||'')).toLowerCase().includes(q))&&(!cat||p.cat===cat)&&(!st||stOf(p)===st)&&kpiMatch(p));
   if(sort==='stock') list=[...list].sort((a,b)=>(a.ondemand?1e9:a.stock)-(b.ondemand?1e9:b.stock));
   else if(sort==='days') list=[...list].sort((a,b)=>{const x=dl(a),y=dl(b);return (x===null?1e9:x)-(y===null?1e9:y);});
   else if(sort==='value') list=[...list].sort((a,b)=>(b.ondemand?0:b.stock*(b.buy||0))-(a.ondemand?0:a.stock*(a.buy||0)));
@@ -838,8 +844,8 @@ const renderInv = () => {
   const soon=normal.filter(p=>{const d=dl(p);return d!==null&&d<=14;}).length;
   const sumEl=document.getElementById('inv-summary');
   if(sumEl) sumEl.innerHTML=`<div class="st-hero"><div><div class="st-hero-l">정상 재고 금액 <small style="opacity:.7;font-size:11px">매입가 기준</small></div><div class="st-hero-n">${stWon(sv)}</div><div class="st-hero-s"><span>관리 부품 <b>${parts.length}종</b></span><span>정상 재고 <b>${normal.length}종 · ${sq}개</b></span><span>주문형 <b>${parts.length-normal.length}종</b></span></div></div>
-    <div class="st-hero-r"><div class="st-kpi"><span>재고 확인 필요</span><b class="${needN?'dn':'up'}">${needN}종</b></div><div class="st-kpi"><span>2주 안 소진 예상</span><b class="${soon?'dn':'up'}">${soon}종</b></div><div class="st-kpi"><span>매입가 미입력</span><b class="${noBuy?'dn':'up'}">${noBuy}종</b></div></div></div>`;
-  document.getElementById('i-chips').innerHTML=[['','전체'],['low','부족'],['out','재고없음'],['ok','정상'],['ondemand','주문형']].map(([k,l])=>`<button class="chip ${st===k?'on':''}" onclick="document.getElementById('i-st').value='${k}';renderInv()">${l} ${cnt(k)}</button>`).join('');
+    <div class="st-hero-r"><div class="st-kpi clk ${kpiF==='need'?'on':''}" onclick="setKpi('need')"><span>재고 확인 필요</span><b class="${needN?'dn':'up'}">${needN}종</b></div><div class="st-kpi clk ${kpiF==='soon'?'on':''}" onclick="setKpi('soon')"><span>2주 안 소진 예상</span><b class="${soon?'dn':'up'}">${soon}종</b></div><div class="st-kpi clk ${kpiF==='nobuy'?'on':''}" onclick="setKpi('nobuy')"><span>매입가 미입력</span><b class="${noBuy?'dn':'up'}">${noBuy}종</b></div></div></div>${kpiF?`<div class="kpi-note"><b>${{need:'재고 확인 필요',soon:'2주 안 소진 예상',nobuy:'매입가 미입력'}[kpiF]}</b> 부품 ${list.length}종만 보는 중<button onclick="setKpi('')">전체 보기 ✕</button></div>`:''}`;
+  document.getElementById('i-chips').innerHTML=[['','전체'],['low','부족'],['out','재고없음'],['ok','정상'],['ondemand','주문형']].map(([k,l])=>`<button class="chip ${st===k?'on':''}" onclick="kpiF_reset();document.getElementById('i-st').value='${k}';renderInv()">${l} ${cnt(k)}</button>`).join('');
   const daysTag=p=>{const d=dl(p);if(d===null)return '';const cls=d<=7?'days-danger':d<=30?'days-warn':'days-ok';return `<span class="days-left ${cls}">약 ${d}일치</span>`;};
   const noBuyTag=p=>p.buy?'':'<span class="inv-warn">매입가 미입력</span>';
   document.getElementById('inv-cards').innerHTML=list.length?list.map(p=>`
